@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MasterUseCase {
     suspend fun getAllSchoolYears(): Flow<Resource<List<SchoolYear>>>
-    suspend fun getAllTeacthers(): Flow<Resource<List<Teacher>>>
+    suspend fun getAllTeachers(): Flow<Resource<List<Teacher>>>
     suspend fun getRemoteClassRooms(): Flow<Resource<List<ClassRoom>>>
     suspend fun getAllClassRooms(): Flow<Resource.Success<List<ClassRoom>>>
     fun getMasterSchoolYears(): Flow<Resource.Success<List<SchoolYear>>>

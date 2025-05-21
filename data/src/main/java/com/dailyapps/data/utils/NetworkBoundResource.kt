@@ -24,6 +24,7 @@ suspend fun<ResultType> apiCall(skipState: Boolean = false, api: suspend() -> Re
                 emit(Resource.Error(msg = message(e)))
             }
         }.catch { error ->
+            error.printStackTrace()
             Timber.e(error.localizedMessage)
             emit(Resource.Loading)
             delay(5)

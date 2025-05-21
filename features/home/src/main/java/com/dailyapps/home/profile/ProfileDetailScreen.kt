@@ -43,7 +43,6 @@ fun ProfileDetailScreen(navController: NavController,
 
     LaunchedEffect(key1 = Unit) {
         homeViewModel.getUser()
-        homeViewModel.getStudent()
     }
 
     Scaffold(
@@ -129,7 +128,7 @@ fun ProfileDetailScreen(navController: NavController,
                             end.linkTo(parent.end, 16.dp)
                             width = Dimension.fillToConstraints
                         },
-                        text = user.email ?: "-",
+                        text = user?.email ?: "-",
                         fontSize = 18.sp,
                         fontFamily = FontType.SEMI_BOLD
                     )
@@ -152,7 +151,7 @@ fun ProfileDetailScreen(navController: NavController,
                             end.linkTo(parent.end, 16.dp)
                             width = Dimension.fillToConstraints
                         },
-                        text = user.username ?: "-",
+                        text = user?.email ?: "-",
                         fontSize = 18.sp,
                         fontFamily = FontType.SEMI_BOLD
                     )

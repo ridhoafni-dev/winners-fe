@@ -79,7 +79,7 @@ fun ProfileScreen(
 
     LaunchedEffect(key1 = Unit) {
         homeViewModel.getUser()
-        homeViewModel.getStudent()
+        //homeViewModel.getStudent()
     }
 
     if (signOutDialogState) {

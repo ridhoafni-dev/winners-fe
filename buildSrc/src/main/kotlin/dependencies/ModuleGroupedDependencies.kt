@@ -9,4 +9,5 @@ internal val featureModule = listOf(
     ModulesDep.absent,
     ModulesDep.exam,
     ModulesDep.score,
+    ModulesDep.observation,
 )

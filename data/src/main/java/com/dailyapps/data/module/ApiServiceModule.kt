@@ -6,6 +6,7 @@ import com.dailyapps.data.remote.service.ExamQuestionService
 import com.dailyapps.data.remote.service.ExamService
 import com.dailyapps.data.remote.service.MasterService
 import com.dailyapps.data.remote.service.NoteService
+import com.dailyapps.data.remote.service.ObservationService
 import com.dailyapps.data.remote.service.ScoreService
 import com.dailyapps.data.remote.service.StudentService
 import dagger.Module
@@ -62,6 +63,12 @@ class ApiServiceModule {
     @Singleton
     fun provideExamQuestionService(retrofit: Retrofit): ExamQuestionService {
         return retrofit.create(ExamQuestionService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideObservationService(retrofit: Retrofit): ObservationService {
+        return retrofit.create(ObservationService::class.java)
     }
 
 }

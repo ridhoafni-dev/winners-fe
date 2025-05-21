@@ -11,7 +11,7 @@ class UserRepository @Inject constructor(
     private val localDataSource: LocalDataSource
 ): IUserRepository {
 
-    override suspend fun getUser(): Flow<User> = localDataSource.getUser()
+    override fun getUser(): Flow<User> = localDataSource.getUser()
 
     override suspend fun storeUser(user: User): Flow<Boolean> = localDataSource.storeUser(user)
 

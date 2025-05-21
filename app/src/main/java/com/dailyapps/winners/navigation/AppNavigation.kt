@@ -28,6 +28,8 @@ import com.dailyapps.feature.exam.pages.token.TokenPage
 import com.dailyapps.feature.exam.pages.token.TokenPageViewModel
 import com.dailyapps.feature.note.NoteScreen
 import com.dailyapps.feature.note.NoteViewModel
+import com.dailyapps.feature.observation.ObservationViewModel
+import com.dailyapps.feature.observation.page.list.ObservationListScreen
 import com.dailyapps.home.HomeViewModel
 import com.dailyapps.home.changepassword.ChangePasswordScreen
 import com.dailyapps.home.dashboard.HomeScreen
@@ -52,7 +54,7 @@ fun AppNavigation() {
     isLoggedIn?.let { loggedIn ->
         AnimatedNavHost(
             navController = navController,
-            startDestination = if (loggedIn) NavRoute.homeScreen else NavRoute.homeScreen
+            startDestination = if (loggedIn) NavRoute.homeScreen else NavRoute.loginScreen
         ) {
             composableWithSlideAnimation(
                 route = NavRoute.loginScreen
@@ -153,6 +155,7 @@ fun AppNavigation() {
                     navController, tokenPageViewModel, token, authToken, ujianId, siswaId, ujianEnd, matpel
                 )
             }
+
             composableWithSlideAnimation(
 //                route = NavRoute.testExamScreen,
                 route = "${NavRoute.testExamScreen}/{authToken}/{ujianId}/{siswaId}/{ujianEnd}/{matpel}",
@@ -187,10 +190,23 @@ fun AppNavigation() {
                     matpel
                 )
             }
+
             composableWithSlideAnimation(
                 route = NavRoute.visiMisiScreen
             ) {
                 VisiMisiScreen(navController)
+            }
+
+
+            composableWithSlideAnimation(
+                route = NavRoute.observationScreen,
+            ) { navBackStackEntry ->
+                val observationViewModel: ObservationViewModel = hiltViewModel()
+
+                ObservationListScreen(
+                    navController,
+                    observationViewModel
+                )
             }
         }
     }

@@ -4,7 +4,7 @@ import com.dailyapps.entity.User
 import kotlinx.coroutines.flow.Flow
 
 interface IUserRepository {
-    suspend fun getUser(): Flow<User>
+    fun getUser(): Flow<User>
     suspend fun storeUser(user: User): Flow<Boolean>
     suspend fun storeId(id: Int)
     suspend fun storeToken(token: String)

@@ -14,4 +14,5 @@ object ModulesDep {
     const val exam = ":features:exam"
     const val score = ":features:score"
     const val note = ":features:note"
+    const val observation = ":features:observation"
 }

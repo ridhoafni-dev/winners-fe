@@ -28,7 +28,7 @@ class LocalDataSource @Inject constructor(
     private val mainDataStore: MainDataStore
 ) {
 
-    suspend fun isLoggedIn() = flow {
+    fun isLoggedIn() = flow {
         mainDataStore.token.collect { emit(it.isNotEmpty()) }
     }.catch {
         Timber.e("LocalDataSource", "isLoggedIn: failed=${it.message}")
@@ -47,25 +47,25 @@ class LocalDataSource @Inject constructor(
     }
 
 
-    suspend fun getCurrentUsername() = flow {
+    fun getCurrentUsername() = flow {
         mainDataStore.username.collect{ emit(it) }
     }.catch {
         Timber.e("LocalDataSource", "getCurrentUsername: failed=${it.message}")
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getCurrentToken() = flow {
+    fun getCurrentToken() = flow {
         mainDataStore.token.collect{ emit(it) }
     }.catch {
         Timber.e("LocalDataSource", "getCurrentToken: failed=${it.message}")
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getCurrentTokenType() = flow {
+    fun getCurrentTokenType() = flow {
         mainDataStore.tokenType.collect{ emit(it) }
     }.catch {
         Timber.e("LocalDataSource", "getCurrentTokenType: failed=${it.message}")
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getCurrentId() = flow {
+    fun getCurrentId() = flow {
         mainDataStore.id.collect { emit(it) }
     }.catch {
         Timber.e("LocalDataSource", "getCurrentId: failed=${it.message}")
@@ -76,7 +76,7 @@ class LocalDataSource @Inject constructor(
     suspend fun storeToken(token: String) = mainDataStore.storeData(MainDataStore.TOKEN, token)
     suspend fun storeId(id: Int) = mainDataStore.storeData(MainDataStore.ID, id)
 
-    suspend fun storeUser(user: User) = flow {
+    fun storeUser(user: User) = flow {
         userDao.storeUser(user.toUserEntity())
         emit(true)
     }.catch {
@@ -84,8 +84,10 @@ class LocalDataSource @Inject constructor(
         emit(false)
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getUser() = flow {
-        userDao.getUserByUsernameNisn().collect { emit(it.toUser()) }
+    fun getUser() = flow {
+        userDao.getUserByUsernameNisn().collect {
+            emit(it.toUser())
+        }
     }.catch {
         Timber.e("LocalDataSource", "getUser: failed=${it.message}")
     }.flowOn(Dispatchers.IO)

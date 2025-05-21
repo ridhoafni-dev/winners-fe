@@ -47,7 +47,8 @@ fun ChangePasswordScreen(
     val changePassword by viewModel.changePassword.collectAsState()
     val context = LocalContext.current
 
-    val currentTokenTypeStudentId by viewModel.currentTokenTypeStudentId.collectAsState()
+    //val currentTokenTypeStudentId by viewModel.currentTokenTypeStudentId.collectAsState()
+    val currentTokenTypeStudentId = Pair(0, 0)
 
     val (token, tokenType) = currentTokenTypeStudentId
 

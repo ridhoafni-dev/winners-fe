@@ -8,17 +8,18 @@ import javax.inject.Inject
 
 class AuthMapper @Inject constructor(): Mapper<BaseResponse<LoginApiResponse>, User> {
     override fun mapFromApiResponse(type: BaseResponse<LoginApiResponse>): User {
-        val data = type.data.user
-        val token = type.data
+        val data = type.data
         return User(
-            data.profilePhotoUrl,
-            data.roles,
-            data.name,
-            data.id,
-            data.email,
-            data.username,
-            token.accessToken,
-            token.tokenType
+            id = data.id ?: 0,
+            name = data.name ?: "",
+            email = data.email ?: "",
+            nim = data.nim ?: "",
+            address = data.address ?: "",
+            role = data.role ?: "",
+            stase = data.stase ?: "",
+            startSchoolYear = data.startSchoolYear ?: 0,
+            endSchoolYear = data.endSchoolYear ?: 0,
+            token = data.token ?: ""
         )
     }
 

@@ -1,21 +1,34 @@
 package com.dailyapps.entity
 
 data class User(
-    val profilePhotoUrl: String? = null,
-    val roles: String? = null,
+    val role: String? = null,
+    val address: String? = null,
+    val nim: String? = null,
     val name: String? = null,
+    val stase: String? = null,
+    val endSchoolYear: Int? = null,
     val id: Int? = null,
     val email: String? = null,
-    val username: String? = null,
-    val token: String? = null,
-    val tokenType: String? = null,
+    val startSchoolYear: Int? = null,
+    val token: String? = null
 ) {
     companion object {
-        val EMPTY = User(profilePhotoUrl = "", roles = "", name = "", id = 0, email = "", username = "", token = "", tokenType = "")
+        val EMPTY = User(
+            role = null,
+            address = null,
+            nim = null,
+            name = null,
+            stase = null,
+            endSchoolYear = null,
+            id = null,
+            email = null,
+            startSchoolYear = null,
+            token = null
+        )
     }
 }
 
 val User.isStudent
-    get() = roles == "SISWA"
+    get() = role == "STUDENT"
 val User.isAdmin
-    get() = roles == "ADMIN"
+    get() = role == "ADMIN"

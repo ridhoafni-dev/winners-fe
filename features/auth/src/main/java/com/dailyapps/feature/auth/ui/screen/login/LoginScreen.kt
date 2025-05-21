@@ -78,8 +78,8 @@ fun LoginScreen(
                         viewModel.storeUser(this)
                         viewModel.storeId(this.id ?: 0)
                         viewModel.storeToken(this.token ?: "")
-                        viewModel.storeTokenType(this.tokenType ?: "")
-                        viewModel.storeUsername(user.username ?: "")
+//                        viewModel.storeTokenType(this.tokenType ?: "")
+                        viewModel.storeUsername(user.email ?: "")
                         Timber.i("Token :: ${this.token ?: ""}")
                     }
                     delay(3000)
