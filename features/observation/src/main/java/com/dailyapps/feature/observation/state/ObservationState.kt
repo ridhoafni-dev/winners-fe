@@ -14,4 +14,7 @@ data class ObservationState(
     val token: String = "",
     val startDate: String = DateUtil.getLastWeekDate(),
     val endDate: String = DateUtil.getCurrentDate(),
-)
+) {
+    val isUserNotExist: Boolean
+        get() = userId == 0L
+}

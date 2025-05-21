@@ -50,13 +50,9 @@ fun HomeScreen(
     val context = LocalContext.current
     val selected by remember { mutableStateOf("") }
 
-    val user by homeViewModel.student.collectAsState()
+    val user by homeViewModel.user.collectAsState()
 
     var backCounter by remember { mutableIntStateOf(1) }
-
-    LaunchedEffect(key1 = Unit) {
-        homeViewModel.getStudent()
-    }
 
     BackHandler(backCounter > 0) {
         Toast.makeText(context, "Tekan sekali lagi untuk keluar", Toast.LENGTH_SHORT).show()
@@ -115,7 +111,7 @@ fun ListHomeMenu(selected: String, navController: NavHostController) {
                     when (_menu.title) {
                         "Observation" -> {
                             Handler(Looper.getMainLooper()).postDelayed({
-                                navController.navigate(NavRoute.absentScreen)
+                                navController.navigate(NavRoute.observationScreen)
                             }, 200)
                         }
 
