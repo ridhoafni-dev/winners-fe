@@ -51,27 +51,22 @@ class AuthViewModel @Inject constructor(
         username.isNotEmpty() && password.isNotEmpty()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun login(username: String, password: String) {
         viewModelScope.launch {
-            authUseCase.execute(
-                AuthUseCase.Params(
-                    username,
-                    password
-                )
-            )
-//            loadMasterData()
-//                .flatMapConcat {
-//                    when (it) {
-//                        is Resource.Loading -> flowOf(Resource.Loading)
-//                        is Resource.Success -> authUseCase.execute(
-//                            AuthUseCase.Params(
-//                                username,
-//                                password
-//                            )
-//                        )
-//                        is Resource.Error -> flowOf(Resource.Error(it.msg))
-//                    }
-//                }
+            loadMasterData()
+                .flatMapConcat {
+                    when (it) {
+                        is Resource.Loading -> flowOf(Resource.Loading)
+                        is Resource.Success -> authUseCase.execute(
+                            AuthUseCase.Params(
+                                username,
+                                password
+                            )
+                        )
+                        is Resource.Error -> flowOf(Resource.Error(it.msg))
+                    }
+                }
 //                .flatMapConcat { userResource ->
 //                    when (userResource) {
 //                        is Resource.Success -> { flowOf(userResource)
@@ -91,7 +86,7 @@ class AuthViewModel @Inject constructor(
 //                        }
 //                    }
 //                }
-//                .filterNot { it is Resource.Loading }
+                .filterNot { it is Resource.Loading }
                 .onStart { emit(Resource.Loading) }
                 .collect { result ->
                     when (result) {

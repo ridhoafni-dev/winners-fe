@@ -1,8 +1,5 @@
 package com.dailyapps.feature.observation.page.list
 
-import android.annotation.SuppressLint
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,24 +21,31 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.dailyapps.common.EmptyList
 import com.dailyapps.common.Neutral100
 import com.dailyapps.common.Neutral300
-import com.dailyapps.common.Primary
 import com.dailyapps.common.White
 import com.dailyapps.common.components.BaseAppBar
 import com.dailyapps.common.components.BaseText
 import com.dailyapps.common.components.ErrorUi
+import com.dailyapps.common.components.FontType
 import com.dailyapps.common.components.LoadingUi
-import com.dailyapps.common.components.TextFieldDropdown
-import com.dailyapps.common.utils.DateTime
+import com.dailyapps.common.utils.DateTime.Companion.formatDate
 import com.dailyapps.common.utils.NavRoute
+import com.dailyapps.common.utils.httpFormat
 import com.dailyapps.entity.Observation
 import com.dailyapps.feature.observation.ObservationViewModel
+import com.dailyapps.feature.observation.components.DateRangeFilter
 import com.dailyapps.feature.observation.state.ObservationAction
 import com.dailyapps.feature.observation.state.ObservationState
 import com.dailyapps.observation.R
@@ -54,14 +59,14 @@ fun ObservationListScreen(
     val state = viewModel.state.collectAsStateWithLifecycle()
     val currentState = state.value
 
-    LaunchedEffect(currentState.startDate, currentState.endDate, currentState.token) {
-        if (currentState.token.isEmpty() || currentState.isUserNotExist) return@LaunchedEffect
+    LaunchedEffect(currentState.list.startDate, currentState.list.endDate, currentState.token) {
+        if (currentState.token.isEmpty() || currentState.list.isUserNotExist) return@LaunchedEffect
 
         viewModel.handleAction(
             ObservationAction.OnGetObservations(
-                userId = currentState.userId,
-                startDate = currentState.startDate,
-                endDate = currentState.endDate,
+                userId = currentState.list.userId,
+                startDate = currentState.list.startDate,
+                endDate = currentState.list.endDate,
                 token = currentState.token
             )
         )
@@ -70,11 +75,32 @@ fun ObservationListScreen(
     ObservationListContent(
         navController = navController,
         state = state.value,
+        onDatePickerChange = { startDate, endDate ->
+            viewModel.handleAction(
+                ObservationAction.OnUpdateDateRange(
+                    startDate = startDate,
+                    endDate = endDate,
+                )
+            )
+            viewModel.handleAction(
+                ObservationAction.OnGetObservations(
+                    userId = currentState.list.userId,
+                    startDate = startDate,
+                    endDate = endDate,
+                    token = currentState.token
+                )
+            )
+        }
     )
 }
 
 @Composable
-fun ObservationListContent(navController: NavHostController, state: ObservationState) {
+fun ObservationListContent(
+    navController: NavHostController,
+    state: ObservationState,
+    onDatePickerChange: (String, String) -> Unit
+) {
+
     Scaffold(
         topBar = {
             BaseAppBar(
@@ -83,9 +109,9 @@ fun ObservationListContent(navController: NavHostController, state: ObservationS
                 menuIconResource = com.dailyapps.common.R.drawable.ic_history,
                 elevation = 1.dp
             ) {
-                Handler(Looper.getMainLooper()).postDelayed({
-                    navController.navigate(NavRoute.noteScreen)
-                }, 200)
+                navController.navigate(NavRoute.addObservationScreen) {
+                    launchSingleTop = true
+                }
             }
         }
     ) { paddingValues ->
@@ -95,12 +121,13 @@ fun ObservationListContent(navController: NavHostController, state: ObservationS
                 .padding(horizontal = 16.dp)
         ) {
             Column {
-                TextFieldDropdown(
+                // Existing content
+                DateRangeFilter(
                     modifier = Modifier.padding(top = 8.dp),
-                    text = "Date",
-                    label = "Date",
-                    itemsDropdown = emptyList(),
-                    onValueChange = { value ->
+                    startDate = state.list.startDate,
+                    endDate = state.list.endDate,
+                    onDateRangeSelected = { startDate, endDate ->
+                        onDatePickerChange(startDate, endDate)
                     }
                 )
 
@@ -111,15 +138,18 @@ fun ObservationListContent(navController: NavHostController, state: ObservationS
                 }
                 else if (state.isError) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        ErrorUi(message = state.errorMessage, onButtonClick = {
-                        })
+                        ErrorUi(message = state.errorMessage, onButtonClick = {})
                     }
                 }
                 else if (state.isEmpty) {
                     EmptyList()
                 }
                 else {
-                    ContentList(state.observations)
+                    ContentList(state.list.observations, onItemClick = { observation ->
+                        navController.navigate("${NavRoute.observationDetailScreen}/${observation.id ?: 0}") {
+                            launchSingleTop = true
+                        }
+                    })
                 }
             }
         }
@@ -127,70 +157,87 @@ fun ObservationListContent(navController: NavHostController, state: ObservationS
 }
 
 @Composable
-fun ContentList(observations: List<Observation>) {
+fun ContentList(observations: List<Observation>, onItemClick: (Observation) -> Unit = {}) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
         items(observations) { observation ->
-            ItemObservation(data = observation)
+            ItemObservation(data = observation) { observationParam ->
+                onItemClick(observationParam)
+            }
         }
     }
 }
 
-    @SuppressLint("NewApi")
-    @Composable
-    fun ItemObservation(
-        data: Observation,
-        modifier: Modifier = Modifier,
-        onItemClick: (Observation) -> Unit = {},
+@Composable
+fun ItemObservation(
+    data: Observation,
+    modifier: Modifier = Modifier,
+    onItemClick: (Observation) -> Unit = {},
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(width = 1.dp, color = Neutral100, shape = RoundedCornerShape(8.dp))
+            .clip(shape = RoundedCornerShape(8.dp))
+            .clickable { onItemClick(data) }
+            .background(White)
     ) {
-        Box(
-            modifier = modifier
+        Row(
+            modifier = Modifier
                 .fillMaxWidth()
-                .border(width = 1.dp, color = Neutral100, shape = RoundedCornerShape(8.dp))
-                .clip(shape = RoundedCornerShape(8.dp))
-                .clickable { onItemClick(data) },
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+            // Image on the left with rounded corners
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Neutral100)
             ) {
-                Column(
-                    modifier = modifier.weight(1f),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    BaseText(
-                        text = data.createAt?.let {
-                            DateTime.getIndoDayOfWeek(it)
-                        } ?: "",
-                        fontColor = Neutral300
+                // If using Coil for image loading
+                data.image?.let { imageUrl ->
+                    androidx.compose.foundation.Image(
+                        painter = rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current).data(data = imageUrl.httpFormat())
+                                .apply(block = fun ImageRequest.Builder.() {
+                                    crossfade(true)
+                                    placeholder(R.drawable.placeholder_image)
+                                    error(R.drawable.error_image)
+                                }).build()
+                        ),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
                     )
-//                    BaseText(
-//                        text = data.tanggalAbsensi?.let {
-//                            "${DateTime.convertToShort(date = it)}, ${absent.jamMasuk}"
-//                        } ?: "",
-//                        fontFamily = FontType.MEDIUM,
-//                        fontWeight = FontWeight.SemiBold,
-//                        fontSize = 20.sp,
-//                        modifier = modifier.padding(top = 8.dp)
-//                    )
                 }
-                Box(
-                    modifier = modifier
-                        .background(color = Primary, shape = RoundedCornerShape(8.dp)),
+            }
 
-                    ) {
-                    data.name?.uppercase()
-                        ?.let {
-                            BaseText(
-                                text = it,
-                                fontColor = White,
-                                modifier = modifier.padding(horizontal = 12.dp, vertical = 2.dp)
-                            )
-                        }
-                }
+            // Texts on the right
+            Column(
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .weight(1f)
+            ) {
+                // Date text
+                BaseText(
+                    text = data.createAt?.let {
+                        formatDate(it)
+                    } ?: "-",
+                    fontColor = Neutral300
+                )
+
+                // Main text
+                BaseText(
+                    text = data.name ?: data.description ?: "",
+                    fontFamily = FontType.MEDIUM,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
         }
     }
+}

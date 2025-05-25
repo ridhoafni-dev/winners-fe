@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Locale
+import java.util.TimeZone
 
 @Suppress("UtilityClassWithPublicConstructor")
 class DateTime {
@@ -39,6 +40,24 @@ class DateTime {
                 formatter.format(localDate)
             } catch (e: java.lang.Exception) {
                 date
+            }
+        }
+
+        @SuppressLint("WeekBasedYear")
+        fun formatDate(
+            date: String,
+            pattern: String = "dd LLL YYYY",
+            default: String = ""
+        ): String {
+            return try {
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+                val dateFormat = inputFormat.parse(date)
+                val outputFormat = SimpleDateFormat(pattern, Locale.getDefault())
+                outputFormat.format(dateFormat!!)
+            } catch (e: Exception) {
+                // Fallback to existing conversion if format doesn't match
+                DateTime.convertToShort(date)
             }
         }
     }

@@ -15,3 +15,9 @@ fun String.convertHtmlToString(): String {
     val htmlText = Html.fromHtml(this, Html.FROM_HTML_MODE_COMPACT)
     return htmlText.trim().toString()
 }
+
+fun String.formatToken(): String {
+    return "Bearer $this"
+}
+
+fun String.httpFormat() = "http://$this"

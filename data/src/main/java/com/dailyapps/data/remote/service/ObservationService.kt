@@ -4,6 +4,7 @@ import com.dailyapps.apiresponse.BaseResponse
 import com.dailyapps.apiresponse.ObservationApiResponse
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ObservationService {
@@ -15,4 +16,10 @@ interface ObservationService {
         @Query("endDate") endDate: String,
         @Query("lecturer") lecturer: Boolean,
     ) : BaseResponse<List<ObservationApiResponse>>
+
+    @GET("observations/{id}")
+    suspend fun getObservationById(
+        @Header("Authorization") token: String,
+        @Path("id") id: Long,
+    ) : BaseResponse<ObservationApiResponse>
 }

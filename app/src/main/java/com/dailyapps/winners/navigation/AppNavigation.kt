@@ -9,8 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.dailyapps.common.utils.NavRoute
 import com.dailyapps.common.utils.toLocalDateTime
 import com.dailyapps.feature.absent.AbsentScreen
@@ -29,6 +27,8 @@ import com.dailyapps.feature.exam.pages.token.TokenPageViewModel
 import com.dailyapps.feature.note.NoteScreen
 import com.dailyapps.feature.note.NoteViewModel
 import com.dailyapps.feature.observation.ObservationViewModel
+import com.dailyapps.feature.observation.page.add.AddObservationScreen
+import com.dailyapps.feature.observation.page.detail.ObservationDetailScreen
 import com.dailyapps.feature.observation.page.list.ObservationListScreen
 import com.dailyapps.home.HomeViewModel
 import com.dailyapps.home.changepassword.ChangePasswordScreen
@@ -39,6 +39,8 @@ import com.dailyapps.home.visi.VisiMisiScreen
 import com.dailyapps.score.ui.screen.ScoreViewModel
 import com.dailyapps.score.ui.screen.detail.ScoreDetailScreen
 import com.dailyapps.score.ui.screen.main.ScoreScreen
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +73,7 @@ fun AppNavigation() {
                 route = NavRoute.homeScreen
             ) {
                 val homeViewModel: HomeViewModel = hiltViewModel()
+
                 HomeScreen(navController, homeViewModel)
             }
             composableWithSlideAnimation(
@@ -157,7 +160,6 @@ fun AppNavigation() {
             }
 
             composableWithSlideAnimation(
-//                route = NavRoute.testExamScreen,
                 route = "${NavRoute.testExamScreen}/{authToken}/{ujianId}/{siswaId}/{ujianEnd}/{matpel}",
                 arguments = listOf(
                     navArgument("authToken") { type = NavType.StringType },
@@ -197,13 +199,39 @@ fun AppNavigation() {
                 VisiMisiScreen(navController)
             }
 
-
             composableWithSlideAnimation(
                 route = NavRoute.observationScreen,
-            ) { navBackStackEntry ->
+            ) { _ ->
                 val observationViewModel: ObservationViewModel = hiltViewModel()
 
                 ObservationListScreen(
+                    navController,
+                    observationViewModel
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.observationDetailScreen}/{observationId}",
+                arguments = listOf(
+                    navArgument("observationId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
+                val observationViewModel: ObservationViewModel = hiltViewModel()
+                val observationId = navBackStackEntry.arguments?.getInt("observationId") ?: 0
+
+                ObservationDetailScreen(
+                    navController,
+                    observationId.toLong(),
+                    observationViewModel
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = NavRoute.addObservationScreen
+            ) { _ ->
+                val observationViewModel: ObservationViewModel = hiltViewModel()
+
+                AddObservationScreen(
                     navController,
                     observationViewModel
                 )

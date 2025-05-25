@@ -2,6 +2,7 @@ package com.dailyapps.data.repository
 
 import com.dailyapps.data.remote.datasource.ObservationRemoteDataSource
 import com.dailyapps.domain.repository.IObservationRepository
+import com.dailyapps.domain.usecase.GetObservationByIdUseCase
 import com.dailyapps.domain.usecase.GetObservationsByUserIdByDateUseCase
 import com.dailyapps.domain.utils.Resource
 import com.dailyapps.entity.Observation
@@ -13,5 +14,8 @@ class ObservationRepository @Inject constructor(
 ) : IObservationRepository {
     override suspend fun getObservationsByUserIdByDate(params: GetObservationsByUserIdByDateUseCase.Params): Flow<Resource<List<Observation>>> =
         remoteDataSource.getObservationsByUserIdByDate(params)
+
+    override suspend fun getObservationById(params: GetObservationByIdUseCase.Params): Flow<Resource<Observation>> =
+        remoteDataSource.getObservationById(params)
 
 }
