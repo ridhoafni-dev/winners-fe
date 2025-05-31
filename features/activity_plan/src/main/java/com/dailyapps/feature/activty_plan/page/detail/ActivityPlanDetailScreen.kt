@@ -134,27 +134,38 @@ fun ActivityPlanDetailScreen(
         },
         containerColor = Color(0xFFFAFAFA)
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
         ) {
             if (currentState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    LoadingUi(modifier = Modifier.align(Alignment.Center))
-                }
+                // Center the loading indicator both horizontally and vertically
+                LoadingUi(modifier = Modifier.align(Alignment.Center))
             }
             else if (currentState.isError) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    ErrorUi(message = currentState.errorMessage, onButtonClick = {})
-                }
+                // Center the error message both horizontally and vertically
+                ErrorUi(
+                    message = currentState.errorMessage,
+                    onButtonClick = {
+                        viewModel.handleAction(
+                            ActivityPlanAction.OnGetActivityPlan(activityPlanId, currentState.token)
+                        )
+                    },
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
             else {
-                DetailContent(
-                    activityPlan = currentState.detail.activityPlan,
-                    lecturers = currentState.add.lecturers
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    DetailContent(
+                        activityPlan = currentState.detail.activityPlan,
+                        lecturers = currentState.add.lecturers
+                    )
+                }
             }
         }
     }
@@ -185,6 +196,21 @@ fun ReviewDialog(
     var ratingError by remember { mutableStateOf("") }
     var commentError by remember { mutableStateOf("") }
     var isSubmitAttempted by remember { mutableStateOf(false) }
+
+    // Track if submission was successful
+    val isLoading = state.isLoading
+    val isSuccess = state.isSuccess
+
+    // Refresh data when submission is successful
+    LaunchedEffect(isSuccess) {
+        if (isSuccess) {
+            // Refetch activity plan details to show the new comment
+            viewModel.handleAction(
+                ActivityPlanAction.OnGetActivityPlan(activityPlanId, state.token)
+            )
+            onDismiss()
+        }
+    }
 
     // Validate function
     fun validateForm(): Boolean {
@@ -359,7 +385,8 @@ fun ReviewDialog(
                                     fontSize = 12.sp
                                 )
                             }
-                        }
+                        },
+                        enabled = !isLoading
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -378,7 +405,8 @@ fun ReviewDialog(
                     ) {
                         Button(
                             onClick = onDismiss,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+                            enabled = !isLoading
                         ) {
                             Text("Cancel")
                         }
@@ -398,12 +426,23 @@ fun ReviewDialog(
                                             comment = comment
                                         )
                                     )
-                                    onDismiss()
+                                    // Don't dismiss here - wait for success in LaunchedEffect
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Primary600)
+                            colors = ButtonDefaults.buttonColors(containerColor = Primary600),
+                            enabled = !isLoading
                         ) {
-                            Text("Submit")
+                            if (isLoading) {
+                                androidx.compose.material.CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Submitting...")
+                            } else {
+                                Text("Submit")
+                            }
                         }
                     }
                 }
