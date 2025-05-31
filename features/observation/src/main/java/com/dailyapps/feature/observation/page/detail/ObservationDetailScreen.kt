@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
@@ -174,5 +175,76 @@ fun DetailContent(observation: Observation) {
             modifier = Modifier.padding(top = 16.dp),
             lineHeight = 24.sp
         )
+
+        // Comments section - only displayed if comments exist
+        observation.observationComments?.let { comment ->
+            androidx.compose.material3.Divider(
+                color = Neutral100,
+                thickness = 1.dp,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    androidx.compose.material.icons.Icons.Outlined.Comment?.let {
+                        androidx.compose.material3.Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Outlined.Comment,
+                            contentDescription = "Comments",
+                            tint = androidx.compose.ui.graphics.Color(0xFFFFB74D),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(8.dp))
+                    BaseText(
+                        text = "Comments",
+                        fontFamily = FontType.SEMI_BOLD,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 16.sp
+                    )
+                }
+
+                androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+
+                // Comment text
+                comment.comment?.let { commentText ->
+                    androidx.compose.material3.Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                        color = androidx.compose.ui.graphics.Color(0xFFFFFDE7)
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            BaseText(
+                                text = commentText,
+                                fontFamily = FontType.REGULAR,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 15.sp,
+                                lineHeight = 22.sp
+                            )
+
+                            // Rating display if available
+                            comment.rating?.let { rating ->
+                                androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    BaseText(
+                                        text = "Rating:",
+                                        fontFamily = FontType.MEDIUM,
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 14.sp,
+                                        fontColor = Neutral300
+                                    )
+                                    androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(4.dp))
+
+                                    RatingBar(rating = rating)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
