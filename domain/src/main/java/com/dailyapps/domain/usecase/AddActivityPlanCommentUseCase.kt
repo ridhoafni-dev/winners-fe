@@ -2,7 +2,6 @@ package com.dailyapps.domain.usecase
 
 import com.dailyapps.domain.repository.IActivityPlanRepository
 import com.dailyapps.domain.utils.Resource
-import com.dailyapps.entity.ActivityPlan
 import com.dailyapps.entity.ActivityPlanComment
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -16,6 +15,7 @@ class AddActivityPlanCommentUseCase @Inject constructor(
 
     data class Params(
         val id: Long,
+        val userId: Long,
         val rating: Int,
         val comment: String,
         val token: String

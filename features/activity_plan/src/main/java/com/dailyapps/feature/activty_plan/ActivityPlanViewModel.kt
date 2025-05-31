@@ -110,7 +110,7 @@ class ActivityPlanViewModel @Inject constructor(
                 restartState()
             }
 
-            is ActivityPlanAction.OnSubmitReview -> onSubmitComment(action.activityPlanId, action.rating, action.comment)
+            is ActivityPlanAction.OnSubmitReview -> onSubmitComment(action.activityPlanId, action.userId, action.rating, action.comment)
         }
     }
 
@@ -210,11 +210,12 @@ class ActivityPlanViewModel @Inject constructor(
         }
     }
 
-    private fun onSubmitComment(id: Long, rating: Int, comment: String) {
+    private fun onSubmitComment(id: Long, userId: Long, rating: Int, comment: String) {
         viewModelScope.launch {
             addActivityPlanComment.execute(
                 AddActivityPlanCommentUseCase.Params(
                     id,
+                    userId,
                     rating,
                     comment,
                     currentState().token

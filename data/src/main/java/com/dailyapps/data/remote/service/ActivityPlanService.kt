@@ -67,6 +67,7 @@ interface ActivityPlanService {
     suspend fun addActivityPlanComment(
         @Header("Authorization") token: String,
         @Path("id") id: Long,
+        @Field("userId") userId: Long,
         @Field("rating") rating: Int,
         @Field("comment") comment: String
     ): BaseResponse<ActivityPlanCommentResponse>

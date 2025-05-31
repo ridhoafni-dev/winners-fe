@@ -100,6 +100,7 @@ class ActivityPlanRemoteDataSource @Inject constructor(
                 activityPlanService.addActivityPlanComment(
                     token = params.token.formatToken(),
                     id = params.id,
+                    userId = params.userId,
                     rating = params.rating,
                     comment = params.comment
                 )

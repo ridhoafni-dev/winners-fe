@@ -78,6 +78,7 @@ import com.dailyapps.entity.ActivityPlan
 import com.dailyapps.entity.Teacher
 import com.dailyapps.feature.activty_plan.ActivityPlanViewModel
 import com.dailyapps.feature.activty_plan.state.ActivityPlanAction
+import com.dailyapps.feature.activty_plan.state.ActivityPlanState
 import com.dailyapps.common.R as commonR
 
 @Composable
@@ -163,6 +164,7 @@ fun ActivityPlanDetailScreen(
         ReviewDialog(
             activityPlanId = activityPlanId,
             viewModel = viewModel,
+            state = currentState,
             onDismiss = { showReviewDialog = false }
         )
     }
@@ -173,6 +175,7 @@ fun ActivityPlanDetailScreen(
 fun ReviewDialog(
     activityPlanId: Long,
     viewModel: ActivityPlanViewModel,
+    state: ActivityPlanState,
     onDismiss: () -> Unit
 ) {
     var comment by remember { mutableStateOf("") }
@@ -390,6 +393,7 @@ fun ReviewDialog(
                                     viewModel.handleAction(
                                         ActivityPlanAction.OnSubmitReview(
                                             activityPlanId = activityPlanId,
+                                            userId = state.userId,
                                             rating = rating,
                                             comment = comment
                                         )
