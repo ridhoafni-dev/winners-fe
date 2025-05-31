@@ -13,6 +13,10 @@ import com.dailyapps.common.utils.NavRoute
 import com.dailyapps.common.utils.toLocalDateTime
 import com.dailyapps.feature.absent.AbsentScreen
 import com.dailyapps.feature.absent.AbsentViewModel
+import com.dailyapps.feature.activty_plan.ActivityPlanViewModel
+import com.dailyapps.feature.activty_plan.page.detail.ActivityPlanDetailScreen
+import com.dailyapps.feature.activty_plan.page.form.ActivityPlanFormScreen
+import com.dailyapps.feature.activty_plan.page.list.ActivityPlanListScreen
 import com.dailyapps.feature.auth.MainViewModel
 import com.dailyapps.feature.auth.ui.screen.AuthViewModel
 import com.dailyapps.feature.auth.ui.screen.login.LoginScreen
@@ -27,8 +31,8 @@ import com.dailyapps.feature.exam.pages.token.TokenPageViewModel
 import com.dailyapps.feature.note.NoteScreen
 import com.dailyapps.feature.note.NoteViewModel
 import com.dailyapps.feature.observation.ObservationViewModel
-import com.dailyapps.feature.observation.page.add.AddObservationScreen
 import com.dailyapps.feature.observation.page.detail.ObservationDetailScreen
+import com.dailyapps.feature.observation.page.form.ObservationFormScreen
 import com.dailyapps.feature.observation.page.list.ObservationListScreen
 import com.dailyapps.home.HomeViewModel
 import com.dailyapps.home.changepassword.ChangePasswordScreen
@@ -227,15 +231,64 @@ fun AppNavigation() {
             }
 
             composableWithSlideAnimation(
-                route = NavRoute.addObservationScreen
-            ) { _ ->
+                route = "${NavRoute.formObservationScreen}/{observationId}",
+                arguments = listOf(
+                navArgument("observationId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
                 val observationViewModel: ObservationViewModel = hiltViewModel()
+                val observationId = navBackStackEntry.arguments?.getInt("observationId") ?: 0
 
-                AddObservationScreen(
+                ObservationFormScreen(
                     navController,
-                    observationViewModel
+                    observationViewModel,
+                    observationId.toLong(),
                 )
             }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.formActivityPlanScreen}/{activityPlanId}",
+                arguments = listOf(
+                navArgument("activityPlanId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
+                val activityPlanViewModel: ActivityPlanViewModel = hiltViewModel()
+                val activityPlanId = navBackStackEntry.arguments?.getInt("activityPlanId") ?: 0
+
+                ActivityPlanFormScreen(
+                    navController,
+                    activityPlanViewModel,
+                    activityPlanId.toLong(),
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.activityPlanDetailScreen}/{activityPlanId}",
+                arguments = listOf(
+                    navArgument("activityPlanId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
+                val activityPlanViewModel: ActivityPlanViewModel = hiltViewModel()
+                val activityPlanId = navBackStackEntry.arguments?.getInt("activityPlanId") ?: 0
+
+                ActivityPlanDetailScreen(
+                    navController,
+                    activityPlanId.toLong(),
+                    activityPlanViewModel
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = NavRoute.activityPlanScreen,
+            ) { _ ->
+                val activityPlanViewModel: ActivityPlanViewModel = hiltViewModel()
+
+                ActivityPlanListScreen(
+                    navController,
+                    activityPlanViewModel
+                )
+            }
+
         }
     }
 }

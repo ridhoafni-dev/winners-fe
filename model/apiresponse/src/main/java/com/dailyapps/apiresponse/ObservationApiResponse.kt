@@ -14,7 +14,10 @@ data class ObservationApiResponse(
 	val name: String? = null,
 
 	@field:SerializedName("observationComments")
-	val observationComments: ObservationComments? = null,
+	val observationCommentsApiResponse: ObservationCommentsApiResponse? = null,
+
+	@field:SerializedName("observationLecturers")
+	val observationLecturer: ObservationLecturerApiResponse? = null,
 
 	@field:SerializedName("description")
 	val description: String? = null,
@@ -29,7 +32,7 @@ data class ObservationApiResponse(
 	val userId: Int? = null,
 
 	@field:SerializedName("user")
-	val user: User? = null,
+	val userApiResponse: UserApiResponse? = null,
 
 	@field:SerializedName("createAt")
 	val createAt: String? = null,
@@ -38,7 +41,7 @@ data class ObservationApiResponse(
 	val updatedAt: String? = null
 )
 
-data class User(
+data class UserApiResponse(
 
 	@field:SerializedName("role")
 	val role: String? = null,
@@ -50,7 +53,7 @@ data class User(
 	val email: String? = null
 )
 
-data class ObservationComments(
+data class ObservationCommentsApiResponse(
 
 	@field:SerializedName("observationId")
 	val observationId: Int? = null,
@@ -66,4 +69,9 @@ data class ObservationComments(
 
 	@field:SerializedName("userId")
 	val userId: Int? = null
+)
+
+data class ObservationLecturerApiResponse(
+	@field:SerializedName("userId")
+	val userId: Long? = null
 )

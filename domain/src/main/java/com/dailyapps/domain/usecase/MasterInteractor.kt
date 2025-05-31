@@ -18,6 +18,8 @@ class MasterInteractor @Inject constructor(
     override suspend fun getAllTeachers(): Flow<Resource<List<Teacher>>> =
         masterRepository.getAllTeachers()
 
+    override suspend fun getAllTeachersAsFlow(): Flow<List<Teacher>> =
+        masterRepository.getAllTeachersAsFlow()
 
     override suspend fun getRemoteClassRooms(): Flow<Resource<List<ClassRoom>>> =
         masterRepository.getRemoteClassRooms()
@@ -25,7 +27,7 @@ class MasterInteractor @Inject constructor(
     override suspend fun getAllClassRooms(): Flow<Resource.Success<List<ClassRoom>>> =
         masterRepository.getAllClassRoom()
 
-    override fun getMasterSchoolYears(): Flow<Resource.Success<List<SchoolYear>>> = masterRepository.getMasterSchoolYears()
+    override suspend fun getMasterSchoolYears(): Flow<Resource.Success<List<SchoolYear>>> = masterRepository.getMasterSchoolYears()
     override suspend fun getSchoolYearId(year: String, sem: String): Resource.Success<SchoolYear> =
         masterRepository.getSchoolYearId(year, sem)
 

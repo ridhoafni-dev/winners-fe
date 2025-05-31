@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="activity_plan_title">Activity Plan</string>
+    <string name="observation_detail_title">Detail</string>
+    <string name="name">Name</string>
+    <string name="lecturer">Lecturer</string>
+    <string name="startDate">Start Date</string>
+    <string name="update">Update</string>
+    <string name="submit">Submit</string>
+    <string name="observation_edit_title">Update</string>
+    <string name="observation_add_title">Add</string>
+    <string name="endDate">End Date</string>
+</resources>

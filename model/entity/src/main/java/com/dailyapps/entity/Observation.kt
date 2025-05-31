@@ -5,6 +5,7 @@ data class Observation(
 	val image: String? = null,
 	val name: String? = null,
 	val observationComments: ObservationComments? = null,
+	val observationLecturer: ObservationLecturer? = null,
 	val description: String? = null,
 	val active: Boolean? = null,
 	val id: Int? = null,
@@ -20,5 +21,9 @@ data class ObservationComments(
 	val comment: String? = null,
 	val id: Int? = null,
 	val userId: Int? = null
+)
+
+data class ObservationLecturer(
+	val userId: Long? = null
 )
 

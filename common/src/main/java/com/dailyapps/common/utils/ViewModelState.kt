@@ -1,4 +1,4 @@
-package com.dailyapps.feature.observation
+package com.dailyapps.common.utils
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

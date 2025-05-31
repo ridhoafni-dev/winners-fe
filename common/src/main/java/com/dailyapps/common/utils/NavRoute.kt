@@ -17,6 +17,9 @@ object NavRoute {
     const val changePasswordScreen = "changePasswordScreen"
     const val visiMisiScreen = "visiMisiScreen"
     const val observationScreen = "observationScreen"
+    const val activityPlanScreen = "activityPlanScreen"
     const val observationDetailScreen = "observationDetailScreen"
-    const val addObservationScreen = "addObservationScreen"
+    const val activityPlanDetailScreen = "activityPlanDetailScreen"
+    const val formObservationScreen = "formObservationScreen"
+    const val formActivityPlanScreen = "formActivityPlanScreen"
 }

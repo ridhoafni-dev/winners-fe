@@ -24,7 +24,7 @@ class MasterRepository @Inject constructor(
     override suspend fun getAllSchoolYears(): Flow<Resource<List<SchoolYear>>> =
         masterRemoteDataSource.getAllSchoolYears()
 
-    override fun getMasterSchoolYears(): Flow<Resource.Success<List<SchoolYear>>> =
+    override suspend fun getMasterSchoolYears(): Flow<Resource.Success<List<SchoolYear>>> =
         masterLocalDataSource.getMasterSchoolYears()
 
     override suspend fun getSchoolYearId(year: String, sem: String): Resource.Success<SchoolYear> =
@@ -36,6 +36,8 @@ class MasterRepository @Inject constructor(
 
     override suspend fun getAllTeachers(): Flow<Resource<List<Teacher>>> =
         masterRemoteDataSource.getAllTeachers()
+
+    override suspend fun getAllTeachersAsFlow(): Flow<List<Teacher>> = masterLocalDataSource.getAllTeachersAsFlow()
 
     //endregion
     //region Class Room

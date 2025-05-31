@@ -15,4 +15,5 @@ object ModulesDep {
     const val score = ":features:score"
     const val note = ":features:note"
     const val observation = ":features:observation"
+    const val activityPlan = ":features:activity_plan"
 }

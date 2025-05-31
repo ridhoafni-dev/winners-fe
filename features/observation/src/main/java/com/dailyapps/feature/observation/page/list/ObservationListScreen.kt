@@ -37,6 +37,7 @@ import com.dailyapps.common.Neutral300
 import com.dailyapps.common.White
 import com.dailyapps.common.components.BaseAppBar
 import com.dailyapps.common.components.BaseText
+import com.dailyapps.common.components.DateRangeFilter
 import com.dailyapps.common.components.ErrorUi
 import com.dailyapps.common.components.FontType
 import com.dailyapps.common.components.LoadingUi
@@ -45,10 +46,10 @@ import com.dailyapps.common.utils.NavRoute
 import com.dailyapps.common.utils.httpFormat
 import com.dailyapps.entity.Observation
 import com.dailyapps.feature.observation.ObservationViewModel
-import com.dailyapps.feature.observation.components.DateRangeFilter
 import com.dailyapps.feature.observation.state.ObservationAction
 import com.dailyapps.feature.observation.state.ObservationState
 import com.dailyapps.observation.R
+import com.dailyapps.common.R as commonR
 
 @Composable
 fun ObservationListScreen(
@@ -60,11 +61,11 @@ fun ObservationListScreen(
     val currentState = state.value
 
     LaunchedEffect(currentState.list.startDate, currentState.list.endDate, currentState.token) {
-        if (currentState.token.isEmpty() || currentState.list.isUserNotExist) return@LaunchedEffect
+        if (currentState.token.isEmpty() || currentState.isUserNotExist) return@LaunchedEffect
 
         viewModel.handleAction(
             ObservationAction.OnGetObservations(
-                userId = currentState.list.userId,
+                userId = currentState.userId,
                 startDate = currentState.list.startDate,
                 endDate = currentState.list.endDate,
                 token = currentState.token
@@ -106,12 +107,10 @@ fun ObservationListContent(
             BaseAppBar(
                 title = stringResource(R.string.title_observation),
                 onClickBack = { navController.popBackStack() },
-                menuIconResource = com.dailyapps.common.R.drawable.ic_history,
+                menuIconResource = commonR.drawable.ic_add,
                 elevation = 1.dp
             ) {
-                navController.navigate(NavRoute.addObservationScreen) {
-                    launchSingleTop = true
-                }
+                navController.navigate("${NavRoute.formObservationScreen}/0")
             }
         }
     ) { paddingValues ->
@@ -128,7 +127,8 @@ fun ObservationListContent(
                     endDate = state.list.endDate,
                     onDateRangeSelected = { startDate, endDate ->
                         onDatePickerChange(startDate, endDate)
-                    }
+                    },
+
                 )
 
                 if (state.isLoading) {
@@ -204,8 +204,8 @@ fun ItemObservation(
                             ImageRequest.Builder(LocalContext.current).data(data = imageUrl.httpFormat())
                                 .apply(block = fun ImageRequest.Builder.() {
                                     crossfade(true)
-                                    placeholder(R.drawable.placeholder_image)
-                                    error(R.drawable.error_image)
+                                    placeholder(commonR.drawable.placeholder_image)
+                                    error(commonR.drawable.error_image)
                                 }).build()
                         ),
                         contentDescription = null,

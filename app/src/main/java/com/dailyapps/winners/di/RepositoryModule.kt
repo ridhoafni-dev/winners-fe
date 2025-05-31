@@ -3,6 +3,7 @@ package com.dailyapps.winners.di
 import com.dailyapps.data.module.ApiServiceModule
 import com.dailyapps.data.module.DatabaseModule
 import com.dailyapps.data.repository.AbsentRepository
+import com.dailyapps.data.repository.ActivityPlanRepository
 import com.dailyapps.data.repository.AuthRepository
 import com.dailyapps.data.repository.ExamQuestionRepository
 import com.dailyapps.data.repository.ExamRepository
@@ -13,6 +14,7 @@ import com.dailyapps.data.repository.ScoreRepository
 import com.dailyapps.data.repository.StudentRepository
 import com.dailyapps.data.repository.UserRepository
 import com.dailyapps.domain.repository.IAbsentRepository
+import com.dailyapps.domain.repository.IActivityPlanRepository
 import com.dailyapps.domain.repository.IAuthRepository
 import com.dailyapps.domain.repository.IExamQuestionRepository
 import com.dailyapps.domain.repository.IExamRepository
@@ -83,6 +85,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideObservationRepository(observationRepository: ObservationRepository): IObservationRepository
+
+    @Binds
+    @Singleton
+    abstract fun provideActivityPlanRepository(activityPlanRepository: ActivityPlanRepository): IActivityPlanRepository
 
 //    @Binds
 //    @Singleton

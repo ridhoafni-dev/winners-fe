@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,11 +36,15 @@ import com.dailyapps.common.components.ErrorUi
 import com.dailyapps.common.components.FontType
 import com.dailyapps.common.components.LoadingUi
 import com.dailyapps.common.utils.DateTime.Companion.formatDate
+import com.dailyapps.common.utils.NavRoute
 import com.dailyapps.common.utils.httpFormat
 import com.dailyapps.entity.Observation
+import com.dailyapps.entity.User
 import com.dailyapps.feature.observation.ObservationViewModel
 import com.dailyapps.feature.observation.state.ObservationAction
+import com.dailyapps.common.R as commonR
 import com.dailyapps.observation.R
+
 
 @Composable
 fun ObservationDetailScreen(
@@ -59,15 +64,18 @@ fun ObservationDetailScreen(
             ObservationAction.OnGetObservation(observationId, currentState.token)
         )
     }
+
     Scaffold(
         topBar = {
             BaseAppBar(
                 title = stringResource(R.string.title_observation_detail),
                 onClickBack = { navController.popBackStack() },
-                menuIconResource = com.dailyapps.common.R.drawable.ic_history,
+                menuIconResource = commonR.drawable.ic_edit,
                 elevation = 1.dp,
                 modifier = modifier,
-                onMenuClick = {},
+                onMenuClick = {
+                    navController.navigate("${NavRoute.formObservationScreen}/$observationId")
+                },
             )
         }
     ) { paddingValues ->
@@ -112,8 +120,8 @@ fun DetailContent(observation: Observation) {
                         .data(data = imageUrl.httpFormat())
                         .apply(block = fun ImageRequest.Builder.() {
                             crossfade(true)
-                            placeholder(R.drawable.placeholder_image)
-                            error(R.drawable.error_image)
+                            placeholder(commonR.drawable.placeholder_image)
+                            error(commonR.drawable.error_image)
                         }).build()
                 ),
                 contentDescription = null,

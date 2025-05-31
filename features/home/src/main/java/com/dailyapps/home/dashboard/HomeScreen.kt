@@ -129,7 +129,7 @@ fun ListHomeMenu(selected: String, navController: NavHostController) {
 
                         "Planned Activities" -> {
                             Handler(Looper.getMainLooper()).postDelayed({
-                                navController.navigate(NavRoute.listExamScreen)
+                                navController.navigate(NavRoute.activityPlanScreen)
                             }, 200)
                         }
 

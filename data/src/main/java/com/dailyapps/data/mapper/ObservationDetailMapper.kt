@@ -5,6 +5,7 @@ import com.dailyapps.apiresponse.ObservationApiResponse
 import com.dailyapps.data.utils.Mapper
 import com.dailyapps.entity.Observation
 import com.dailyapps.entity.ObservationComments
+import com.dailyapps.entity.ObservationLecturer
 import com.dailyapps.entity.User
 import javax.inject.Inject
 
@@ -15,7 +16,7 @@ class ObservationDetailMapper @Inject constructor(): Mapper<BaseResponse<Observa
                 date = data.date,
                 image = data.image,
                 name = data.name,
-                observationComments = data.observationComments?.let {
+                observationComments = data.observationCommentsApiResponse?.let {
                     ObservationComments(
                         observationId = it.observationId,
                         rating = it.rating,
@@ -24,11 +25,16 @@ class ObservationDetailMapper @Inject constructor(): Mapper<BaseResponse<Observa
                         userId = it.userId
                     )
                 },
+                observationLecturer = data.observationLecturer?.let {
+                    ObservationLecturer(
+                        userId = it.userId,
+                    )
+                },
                 description = data.description,
                 active = data.active,
                 id = data.id,
                 userId = data.userId,
-                user = data.user?.let {
+                user = data.userApiResponse?.let {
                     User(
                         id = it.id,
                         email = it.email

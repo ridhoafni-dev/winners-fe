@@ -30,5 +30,7 @@ data class User(
 
 val User.isStudent
     get() = role == "STUDENT"
+val User.isLecturer
+    get() = role == "LECTURER"
 val User.isAdmin
     get() = role == "ADMIN"

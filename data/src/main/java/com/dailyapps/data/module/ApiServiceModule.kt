@@ -1,6 +1,7 @@
 package com.dailyapps.data.module
 
 import com.dailyapps.data.remote.service.AbsentService
+import com.dailyapps.data.remote.service.ActivityPlanService
 import com.dailyapps.data.remote.service.AuthService
 import com.dailyapps.data.remote.service.ExamQuestionService
 import com.dailyapps.data.remote.service.ExamService
@@ -69,6 +70,12 @@ class ApiServiceModule {
     @Singleton
     fun provideObservationService(retrofit: Retrofit): ObservationService {
         return retrofit.create(ObservationService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideActivityPlanService(retrofit: Retrofit): ActivityPlanService {
+        return retrofit.create(ActivityPlanService::class.java)
     }
 
 }
