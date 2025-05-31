@@ -66,6 +66,7 @@ fun ActivityPlanFormScreen(
                     startDate = currentState.add.startDate,
                     endDate = today,
                     lecturerId = currentState.add.lecturerId,
+                    status = currentState.add.status
                 )
             )
         }
@@ -92,18 +93,20 @@ fun ActivityPlanFormScreen(
                     startDate = observation.startDate ?: "",
                     endDate = observation.endDate ?: "",
                     lecturerId = observation.activityPlanLecturer?.userId?.toLong() ?: 0L,
+                    status = observation.status ?: "Aktif"
                 )
             )
         }
     }
 
-    val onValueChanged = { name: String, startDate: String, endDate: String, lecturerId: Long ->
+    val onValueChanged = { name: String, startDate: String, endDate: String, lecturerId: Long, status: String ->
         viewModel.handleAction(
             ActivityPlanAction.OnActivityPlanValueChange(
                 name = name,
                 startDate = startDate,
                 endDate = endDate,
                 lecturerId = lecturerId,
+                status = status
             )
         )
     }
@@ -153,7 +156,7 @@ fun ActivityPlanFormScreen(
 fun FormContent(
     state: ActivityPlanState,
     modifier: Modifier,
-    onValueChanged: (name: String, startDate: String, endDate: String, lecturer: Long) -> Unit = { _, _, _, _ -> },
+    onValueChanged: (name: String, startDate: String, endDate: String, lecturer: Long, status: String) -> Unit = { _, _, _, _, _ -> },
     onSubmit: () -> Unit = {},
     onSuccess: () -> Unit = {},
     isEditMode: Boolean = false
@@ -171,6 +174,7 @@ fun FormContent(
     val startDate = currentState.startDate
     val endDate = currentState.endDate
     val selectedLecture = currentState.lecturerId
+    val status = currentState.status
 
     // Validation state
     var nameError by remember { mutableStateOf("") }
@@ -304,7 +308,7 @@ fun FormContent(
                 // Format the selected date
                 val newStartDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
                 // Update the date using onValueChanged callback
-                onValueChanged(name, newStartDate, endDate, selectedLecture)
+                onValueChanged(name, newStartDate, endDate, selectedLecture, status)
                 // Hide the date picker
                 showStartDatePicker = false
                 // Clear error if set
@@ -337,7 +341,7 @@ fun FormContent(
                 // Format the selected date
                 val newEndDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
                 // Update the date using onValueChanged callback
-                onValueChanged(name, startDate, newEndDate, selectedLecture)
+                onValueChanged(name, startDate, newEndDate, selectedLecture, status)
                 // Hide the date picker
                 showEndDatePicker = false
                 // Clear error if set
@@ -393,7 +397,7 @@ fun FormContent(
             keyboardType = KeyboardType.Text,
             onValueChange = { currentName ->
                 onValueChanged(
-                    currentName, startDate, endDate, selectedLecture
+                    currentName, startDate, endDate, selectedLecture, status
                 )
                 if (currentName.isNotBlank()) {
                     nameError = ""
@@ -430,7 +434,7 @@ fun FormContent(
                 lecturers.find { it.name == selectedName }?.let { lecturer ->
                     selectedLecturerName = selectedName // Update immediately for UI responsiveness
                     onValueChanged(
-                        name, startDate, endDate, lecturer.id?.toLong() ?: 0L
+                        name, startDate, endDate, lecturer.id?.toLong() ?: 0L, status
                     )
                     lecturerError = "" // Clear error when an item is selected
                 }
@@ -493,6 +497,26 @@ fun FormContent(
                 color = Color.Red,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+            )
+        }
+
+        // Status dropdown - only appears in edit mode
+        if (isEditMode) {
+            // Status options
+            val statusOptions = listOf("Aktif", "Reschedule", "Batal")
+
+            TextFieldDropdown(
+                modifier = Modifier.padding(top = 16.dp),
+                text = status,
+                label = "Status",
+                itemsDropdown = statusOptions,
+                onValueChange = { selectedStatus ->
+                    onValueChanged(
+                        name, startDate, endDate, selectedLecture, selectedStatus
+                    )
+                },
+                enabled = !isLoading,
+                isError = false
             )
         }
 

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -53,7 +54,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -106,19 +106,26 @@ fun ActivityPlanDetailScreen(
         currentState.isUserLecturer
     }
 
+    // Check if activity plan already has a comment
+    val hasExistingComment = remember(currentState.detail.activityPlan) {
+        currentState.detail.activityPlan.activityPlanComment != null
+    }
+
     Scaffold(
         topBar = {
             BaseAppBar(
                 title = stringResource(R.string.observation_detail_title),
                 onClickBack = { navController.popBackStack() },
-                // Use imageVector instead of resource id for Material icons
-                menuIconResource = if (isUserLecturer) commonR.drawable.ic_review else commonR.drawable.ic_edit,
+                // Only show menu icon if user is lecturer with no existing comment or if user is not lecturer
+                menuIconResource = if (isUserLecturer && !hasExistingComment) commonR.drawable.ic_review
+                                 else if (!isUserLecturer) commonR.drawable.ic_edit
+                                 else null,
                 elevation = 1.dp,
                 modifier = modifier,
                 onMenuClick = {
-                    if (isUserLecturer) {
+                    if (isUserLecturer && !hasExistingComment) {
                         showReviewDialog = true
-                    } else {
+                    } else if (!isUserLecturer) {
                         navController.navigate("${NavRoute.formActivityPlanScreen}/$activityPlanId")
                     }
                 },
@@ -202,175 +209,198 @@ fun ReviewDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .heightIn(max = 560.dp), // Set maximum height
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Dialog Title
-                BaseText(
-                    text = "Review Activity",
-                    fontFamily = FontType.SEMI_BOLD,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                // Rating Section
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    BaseText(
-                        text = "Rating",
-                        fontFamily = FontType.MEDIUM,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                    )
-
-                    BaseText(
-                        text = "$rating/5",
-                        fontFamily = FontType.MEDIUM,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        fontColor = if (rating > 0) Primary600 else Neutral300
-                    )
-                }
-
-                // Star Rating Display with clickable stars
-                Row(
-                    modifier = Modifier.padding(vertical = 8.dp)
-                ) {
-                    repeat(5) { index ->
-                        val starPosition = index + 1
-                        Icon(
-                            imageVector = if (starPosition <= rating) Icons.Filled.Star else Icons.Outlined.StarOutline,
-                            contentDescription = "Rating $starPosition",
-                            tint = if (starPosition <= rating) Color(0xFFFFC107) else Neutral300,
-                            modifier = Modifier
-                                .size(36.dp)
-                                .padding(4.dp)
-                                .clip(CircleShape)
-                                // Make stars clickable for easier rating selection
-                                .background(Color.Transparent)
-                                .clickable {
-                                    rating = starPosition
-                                    if (rating > 0) {
-                                        ratingError = ""
-                                    }
-                                }
-                        )
-                    }
-                }
-
-                // Error message for rating
-                if (isSubmitAttempted && ratingError.isNotEmpty()) {
-                    Text(
-                        text = ratingError,
-                        color = Color.Red,
-                        fontSize = 12.sp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 4.dp, vertical = 2.dp)
-                    )
-                }
-
-                // Rating Slider
-                Slider(
-                    value = rating.toFloat(),
-                    onValueChange = {
-                        rating = it.toInt()
-                        // Clear error when user selects a valid rating
-                        if (rating > 0) {
-                            ratingError = ""
-                        }
-                    },
-                    valueRange = 0f..5f,
-                    steps = 4,
-                    colors = SliderDefaults.colors(
-                        thumbColor = Primary600,
-                        activeTrackColor = Primary600,
-                        inactiveTrackColor = Neutral300
-                    ),
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
-                )
-
-                // Comment Input - now with error state
-                OutlinedTextField(
-                    value = comment,
-                    onValueChange = {
-                        comment = it
-                        // Clear error when user starts typing a valid comment
-                        if (comment.length >= 5) {
-                            commentError = ""
-                        }
-                    },
-                    label = { Text("Comment") },
-                    placeholder = { Text("Enter your feedback here (required)") },
+                // Dialog Title - Keep outside of scroll area
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .height(120.dp),
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Sentences,
-                        keyboardType = KeyboardType.Text
-                    ),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = if (isSubmitAttempted && commentError.isNotEmpty()) Color.Red else Primary600,
-                        unfocusedBorderColor = if (isSubmitAttempted && commentError.isNotEmpty()) Color.Red else Neutral300
-                    ),
-                    isError = isSubmitAttempted && commentError.isNotEmpty(),
-                    supportingText = {
-                        if (isSubmitAttempted && commentError.isNotEmpty()) {
-                            Text(
-                                text = commentError,
-                                color = Color.Red,
-                                fontSize = 12.sp
+                        .background(Primary600.copy(alpha = 0.05f))
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    BaseText(
+                        text = "Review Activity",
+                        fontFamily = FontType.SEMI_BOLD,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                    )
+                }
+
+                // Scrollable content
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = false)
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Rating Section
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BaseText(
+                            text = "Rating",
+                            fontFamily = FontType.MEDIUM,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                        )
+
+                        BaseText(
+                            text = "$rating/5",
+                            fontFamily = FontType.MEDIUM,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            fontColor = if (rating > 0) Primary600 else Neutral300
+                        )
+                    }
+
+                    // Star Rating Display with clickable stars
+                    Row(
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    ) {
+                        repeat(5) { index ->
+                            val starPosition = index + 1
+                            Icon(
+                                imageVector = if (starPosition <= rating) Icons.Filled.Star else Icons.Outlined.StarOutline,
+                                contentDescription = "Rating $starPosition",
+                                tint = if (starPosition <= rating) Color(0xFFFFC107) else Neutral300,
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .padding(4.dp)
+                                    .clip(CircleShape)
+                                    // Make stars clickable for easier rating selection
+                                    .background(Color.Transparent)
+                                    .clickable {
+                                        rating = starPosition
+                                        if (rating > 0) {
+                                            ratingError = ""
+                                        }
+                                    }
                             )
                         }
                     }
-                )
 
-                // Action Buttons
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Button(
-                        onClick = onDismiss,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
-                    ) {
-                        Text("Cancel")
+                    // Error message for rating
+                    if (isSubmitAttempted && ratingError.isNotEmpty()) {
+                        Text(
+                            text = ratingError,
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 4.dp, vertical = 2.dp)
+                        )
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Button(
-                        onClick = {
-                            // Validate form before submitting
-                            if (validateForm()) {
-                                // Submit review logic here
-                                viewModel.handleAction(
-                                    ActivityPlanAction.OnSubmitReview(
-                                        activityPlanId = activityPlanId,
-                                        rating = rating,
-                                        comment = comment
-                                    )
-                                )
-                                onDismiss()
+                    // Rating Slider
+                    Slider(
+                        value = rating.toFloat(),
+                        onValueChange = {
+                            rating = it.toInt()
+                            // Clear error when user selects a valid rating
+                            if (rating > 0) {
+                                ratingError = ""
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Primary600)
+                        valueRange = 0f..5f,
+                        steps = 4,
+                        colors = SliderDefaults.colors(
+                            thumbColor = Primary600,
+                            activeTrackColor = Primary600,
+                            inactiveTrackColor = Neutral300
+                        ),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                    )
+
+                    // Comment Input - now with error state
+                    OutlinedTextField(
+                        value = comment,
+                        onValueChange = {
+                            comment = it
+                            // Clear error when user starts typing a valid comment
+                            if (comment.length >= 5) {
+                                commentError = ""
+                            }
+                        },
+                        label = { Text("Comment") },
+                        placeholder = { Text("Enter your feedback here (required)") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .height(120.dp),
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            keyboardType = KeyboardType.Text
+                        ),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = if (isSubmitAttempted && commentError.isNotEmpty()) Color.Red else Primary600,
+                            unfocusedBorderColor = if (isSubmitAttempted && commentError.isNotEmpty()) Color.Red else Neutral300
+                        ),
+                        isError = isSubmitAttempted && commentError.isNotEmpty(),
+                        supportingText = {
+                            if (isSubmitAttempted && commentError.isNotEmpty()) {
+                                Text(
+                                    text = commentError,
+                                    color = Color.Red,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                // Action Buttons - Keep outside of scroll area
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Text("Submit")
+                        Button(
+                            onClick = onDismiss,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                        ) {
+                            Text("Cancel")
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Button(
+                            onClick = {
+                                // Validate form before submitting
+                                if (validateForm()) {
+                                    // Submit review logic here
+                                    viewModel.handleAction(
+                                        ActivityPlanAction.OnSubmitReview(
+                                            activityPlanId = activityPlanId,
+                                            rating = rating,
+                                            comment = comment
+                                        )
+                                    )
+                                    onDismiss()
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Primary600)
+                        ) {
+                            Text("Submit")
+                        }
                     }
                 }
             }
@@ -413,10 +443,10 @@ fun DetailContent(
                 .padding(16.dp)
         ) {
             // Title and Status Header
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.Start
             ) {
                 // Plan name with truncation
                 BaseText(
@@ -426,10 +456,9 @@ fun DetailContent(
                     fontSize = 20.sp,
                     lineHeight = 24.sp,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Status chip
                 StatusChip(status = activityPlan.status ?: "Unknown", color = statusColor)
@@ -545,7 +574,7 @@ fun StatusChip(status: String, color: Color) {
         color = color.copy(alpha = 0.12f)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(

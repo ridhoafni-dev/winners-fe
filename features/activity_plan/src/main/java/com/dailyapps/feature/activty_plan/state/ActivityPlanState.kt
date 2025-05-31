@@ -46,4 +46,5 @@ data class FormActivityPlanState(
     val endDate: String = "",
     val name: String = "",
     val lecturerId: Long = 0L,
+    val status: String = "Aktif",
 )

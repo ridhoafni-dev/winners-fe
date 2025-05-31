@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,6 +67,11 @@ fun ActivityPlanListScreen(
     val state = viewModel.state.collectAsStateWithLifecycle()
     val currentState = state.value
 
+    // Check if the current user is a lecturer
+    val isUserLecturer = remember(currentState.role) {
+        currentState.isUserLecturer
+    }
+
     LaunchedEffect(currentState.list.startDate, currentState.list.endDate, currentState.token) {
         if (currentState.token.isEmpty() || currentState.isUserNotExist) return@LaunchedEffect
 
@@ -93,6 +99,7 @@ fun ActivityPlanListScreen(
     ListContent(
         navController = navController,
         state = state.value,
+        isUserLecturer = isUserLecturer,
         onDatePickerChange = { startDate, endDate ->
             viewModel.handleAction(
                 ActivityPlanAction.OnUpdateDateRange(
@@ -117,6 +124,7 @@ fun ActivityPlanListScreen(
 fun ListContent(
     navController: NavHostController,
     state: ActivityPlanState,
+    isUserLecturer: Boolean = false,
     onDatePickerChange: (String, String) -> Unit,
     onRetry: () -> Unit = {}
 ) {
@@ -126,11 +134,15 @@ fun ListContent(
             BaseAppBar(
                 title = stringResource(R.string.activity_plan_title),
                 onClickBack = { navController.popBackStack() },
-                menuIconResource = commonR.drawable.ic_add,
-                elevation = 1.dp
-            ) {
-                navController.navigate("${NavRoute.formActivityPlanScreen}/0")
-            }
+                // Only show menu icon (add button) if user is not a lecturer
+                menuIconResource = if (!isUserLecturer) commonR.drawable.ic_add else null,
+                elevation = 1.dp,
+                onMenuClick = if (!isUserLecturer) {
+                    { navController.navigate("${NavRoute.formActivityPlanScreen}/0") }
+                } else {
+                    {}
+                }
+            )
         }
     ) { paddingValues ->
         Box(
