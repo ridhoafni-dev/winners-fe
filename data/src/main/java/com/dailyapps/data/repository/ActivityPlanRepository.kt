@@ -2,12 +2,14 @@ package com.dailyapps.data.repository
 
 import com.dailyapps.data.remote.datasource.ActivityPlanRemoteDataSource
 import com.dailyapps.domain.repository.IActivityPlanRepository
+import com.dailyapps.domain.usecase.AddActivityPlanCommentUseCase
 import com.dailyapps.domain.usecase.AddActivityPlanUseCase
 import com.dailyapps.domain.usecase.GetActivityPlanByIdUseCase
 import com.dailyapps.domain.usecase.GetActivityPlansByUserIdByDateUseCase
 import com.dailyapps.domain.usecase.UpdateActivityPlanUseCase
 import com.dailyapps.domain.utils.Resource
 import com.dailyapps.entity.ActivityPlan
+import com.dailyapps.entity.ActivityPlanComment
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -23,8 +25,10 @@ class ActivityPlanRepository @Inject constructor(
     override suspend fun addActivityPlan(params: AddActivityPlanUseCase.Params): Flow<Resource<ActivityPlan>> =
         remoteDataSource.addActivityPlan(params)
 
-
     override suspend fun updateActivityPlan(params: UpdateActivityPlanUseCase.Params): Flow<Resource<ActivityPlan>> =
         remoteDataSource.updateActivityPlan(params)
 
+    override suspend fun addActivityPlanComment(params: AddActivityPlanCommentUseCase.Params): Flow<Resource<ActivityPlanComment>> =
+        remoteDataSource.addActivityPlanComment(params)
 }
+

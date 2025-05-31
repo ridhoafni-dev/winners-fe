@@ -24,7 +24,7 @@ class ActivityPlanDetailMapper @Inject constructor(): Mapper<BaseResponse<Activi
             updatedAt = response.updatedAt,
             user = mapUser(response.user),
             activityPlanLecturer = mapActivityPlanLecturer(response.activityPlanLecturer),
-            activityPlanComment = mapActivityPlanComment(response.activityPlanComment)
+            activityPlanComment = mapActivityPlanComment(response.activityPlanCommentResponse)
         )
     }
 
@@ -44,7 +44,7 @@ class ActivityPlanDetailMapper @Inject constructor(): Mapper<BaseResponse<Activi
         )
     }
 
-    private fun mapActivityPlanComment(apiComment: com.dailyapps.apiresponse.ActivityPlanComment?): ActivityPlanComment? {
+    private fun mapActivityPlanComment(apiComment: com.dailyapps.apiresponse.ActivityPlanCommentResponse?): ActivityPlanComment? {
         return if (apiComment == null) null
         else ActivityPlanComment(
             id = apiComment.id,

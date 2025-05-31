@@ -5,7 +5,6 @@ import com.dailyapps.apiresponse.ActivityPlanApiResponse
 import com.dailyapps.apiresponse.AddActivityPlanResponse
 import com.dailyapps.data.utils.Mapper
 import com.dailyapps.entity.ActivityPlan
-import com.dailyapps.entity.ActivityPlanComment
 import com.dailyapps.entity.ActivityPlanLecturer
 import com.dailyapps.entity.User
 import javax.inject.Inject

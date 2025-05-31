@@ -24,7 +24,10 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.net.toUri
+import com.dailyapps.data.mapper.AddActivityPlanCommentMapper
+import com.dailyapps.domain.usecase.AddActivityPlanCommentUseCase
 import com.dailyapps.domain.usecase.UpdateActivityPlanUseCase
+import com.dailyapps.entity.ActivityPlanComment
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Singleton
@@ -33,7 +36,7 @@ class ActivityPlanRemoteDataSource @Inject constructor(
     private val activityPlanMapper: ActivityPlanMapper,
     private val activityPlanDetailMapper: ActivityPlanDetailMapper,
     private val addActivityPlanMapper: AddActivityPlanMapper,
-    @ApplicationContext private val context: Context
+    private val addActivityPlanCommentMapper: AddActivityPlanCommentMapper,
 ){
     suspend fun getActivityPlansByUserIdByDate(params: GetActivityPlansByUserIdByDateUseCase.Params) : Flow<Resource<List<ActivityPlan>>> {
         return mapFromApiResponse(
@@ -83,11 +86,25 @@ class ActivityPlanRemoteDataSource @Inject constructor(
                     startDate = params.startDate,
                     endDate = params.endDate,
                     active = true,
-                    status = "Aktif",
+                    status = params.status,
                     lecturerId = params.lecturerId
                 )
             },
             addActivityPlanMapper
+        )
+    }
+
+    suspend fun addActivityPlanComment(params: AddActivityPlanCommentUseCase.Params): Flow<Resource<ActivityPlanComment>> {
+        return mapFromApiResponse(
+            result = apiCall {
+                activityPlanService.addActivityPlanComment(
+                    token = params.token.formatToken(),
+                    id = params.id,
+                    rating = params.rating,
+                    comment = params.comment
+                )
+            },
+            addActivityPlanCommentMapper
         )
     }
 }

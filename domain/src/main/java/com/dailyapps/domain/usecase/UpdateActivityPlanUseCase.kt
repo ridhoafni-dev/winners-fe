@@ -23,7 +23,8 @@ class UpdateActivityPlanUseCase @Inject constructor(
         val startDate: String,
         val endDate: String,
         val lecturerId: Long,
-        val token: String
+        val token: String,
+        val status: String,
     )
 
 }

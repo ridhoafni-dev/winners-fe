@@ -1,6 +1,7 @@
 package com.dailyapps.data.remote.service
 
 import com.dailyapps.apiresponse.ActivityPlanApiResponse
+import com.dailyapps.apiresponse.ActivityPlanCommentResponse
 import com.dailyapps.apiresponse.AddActivityPlanResponse
 import com.dailyapps.apiresponse.AddObservationResponse
 import com.dailyapps.apiresponse.BaseResponse
@@ -60,4 +61,14 @@ interface ActivityPlanService {
         @Field("status") status: String,
         @Field("lecturerId") lecturerId: Long,
     ): BaseResponse<AddActivityPlanResponse>
+
+    @FormUrlEncoded
+    @POST("plans/comment/{id}")
+    suspend fun addActivityPlanComment(
+        @Header("Authorization") token: String,
+        @Path("id") id: Long,
+        @Field("rating") rating: Int,
+        @Field("comment") comment: String
+    ): BaseResponse<ActivityPlanCommentResponse>
 }
+

@@ -38,10 +38,10 @@ data class ActivityPlanApiResponse(
 	val updatedAt: String? = null,
 
 	@field:SerializedName("activityPlanComment")
-	val activityPlanComment: ActivityPlanComment? = null
+	val activityPlanCommentResponse: ActivityPlanCommentResponse? = null
 )
 
-data class ActivityPlanComment(
+data class ActivityPlanCommentResponse(
 
 	@field:SerializedName("rating")
 	val rating: Int? = null,

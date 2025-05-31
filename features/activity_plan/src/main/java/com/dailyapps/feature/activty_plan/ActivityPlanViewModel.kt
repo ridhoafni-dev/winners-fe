@@ -2,6 +2,7 @@ package com.dailyapps.feature.activty_plan
 
 import androidx.lifecycle.viewModelScope
 import com.dailyapps.common.utils.ViewModelState
+import com.dailyapps.domain.usecase.AddActivityPlanCommentUseCase
 import com.dailyapps.domain.usecase.AddActivityPlanUseCase
 import com.dailyapps.domain.usecase.GetActivityPlanByIdUseCase
 import com.dailyapps.domain.usecase.GetActivityPlansByUserIdByDateUseCase
@@ -27,6 +28,7 @@ class ActivityPlanViewModel @Inject constructor(
     private val getActivityPlanByUseCase: GetActivityPlanByIdUseCase,
     private val addActivityPlan: AddActivityPlanUseCase,
     private val updateActivityPlan: UpdateActivityPlanUseCase,
+    private val addActivityPlanComment: AddActivityPlanCommentUseCase,
     private val userUseCase: UserUseCase,
     private val masterUseCase: MasterUseCase
 ) : ViewModelState<ActivityPlanState, ActivityPlanAction>(
@@ -108,7 +110,7 @@ class ActivityPlanViewModel @Inject constructor(
                 restartState()
             }
 
-            is ActivityPlanAction.OnSubmitReview -> TODO()
+            is ActivityPlanAction.OnSubmitReview -> onSubmitComment(action.activityPlanId, action.rating, action.comment)
         }
     }
 
@@ -122,7 +124,8 @@ class ActivityPlanViewModel @Inject constructor(
                     currentState().add.startDate,
                     currentState().add.endDate,
                     currentState().add.lecturerId,
-                    currentState().token
+                    currentState().token,
+                    currentState().add.status,
                 )
             )
                 .collectLatest { resource ->
@@ -169,6 +172,51 @@ class ActivityPlanViewModel @Inject constructor(
                     currentState().add.startDate,
                     currentState().add.endDate,
                     currentState().add.lecturerId,
+                    currentState().token
+                )
+            )
+                .collectLatest { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            update {
+                                copy(
+                                    isLoading = false,
+                                    isSuccess = true
+                                )
+                            }
+                        }
+
+                        is Resource.Error -> {
+                            update {
+                                copy(
+                                    isLoading = false,
+                                    isError = true,
+                                    errorMessage = resource.msg
+                                )
+                            }
+                        }
+
+                        Resource.Loading -> {
+                            update {
+                                copy(
+                                    isLoading = true,
+                                    isError = false,
+                                    errorMessage = ""
+                                )
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun onSubmitComment(id: Long, rating: Int, comment: String) {
+        viewModelScope.launch {
+            addActivityPlanComment.execute(
+                AddActivityPlanCommentUseCase.Params(
+                    id,
+                    rating,
+                    comment,
                     currentState().token
                 )
             )
