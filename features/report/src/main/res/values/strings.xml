@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="reports_title">Reports</string>
+    <string name="download_report">Download Report</string>
+    <string name="downloading">Downloading...</string>
+    <string name="download_success">Download Successful</string>
+    <string name="download_error">Download Failed</string>
+</resources>

@@ -22,4 +22,5 @@ object NavRoute {
     const val activityPlanDetailScreen = "activityPlanDetailScreen"
     const val formObservationScreen = "formObservationScreen"
     const val formActivityPlanScreen = "formActivityPlanScreen"
+    const val reportScreen = "reportScreen"
 }

@@ -34,6 +34,8 @@ import com.dailyapps.feature.observation.ObservationViewModel
 import com.dailyapps.feature.observation.page.detail.ObservationDetailScreen
 import com.dailyapps.feature.observation.page.form.ObservationFormScreen
 import com.dailyapps.feature.observation.page.list.ObservationListScreen
+import com.dailyapps.feature.report.ReportViewModel
+import com.dailyapps.feature.report.page.list.ReportListScreen
 import com.dailyapps.home.HomeViewModel
 import com.dailyapps.home.changepassword.ChangePasswordScreen
 import com.dailyapps.home.dashboard.HomeScreen
@@ -286,6 +288,17 @@ fun AppNavigation() {
                 ActivityPlanListScreen(
                     navController,
                     activityPlanViewModel
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = NavRoute.reportScreen,
+            ) { _ ->
+                val reportViewModel: ReportViewModel = hiltViewModel()
+
+                ReportListScreen(
+                    navController,
+                    reportViewModel
                 )
             }
 
