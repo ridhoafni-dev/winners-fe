@@ -6,6 +6,6 @@ import javax.inject.Inject
 
 class DownloadReportMapper @Inject constructor() : Mapper<BaseResponse<String>, String> {
     override fun mapFromApiResponse(type: BaseResponse<String>): String {
-        return type.data ?: ""
+        return type.data
     }
 }

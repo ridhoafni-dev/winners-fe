@@ -115,9 +115,9 @@ fun ListHomeMenu(selected: String, navController: NavHostController) {
                             }, 200)
                         }
 
-                        "Reports" -> {
+                        "Report" -> {
                             Handler(Looper.getMainLooper()).postDelayed({
-                                navController.navigate(NavRoute.registerScreen)
+                                navController.navigate(NavRoute.reportScreen)
                             }, 200)
                         }
 

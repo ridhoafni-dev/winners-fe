@@ -61,6 +61,7 @@ import com.dailyapps.feature.report.state.ReportAction
 import com.dailyapps.feature.report.state.ReportState
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.dailyapps.common.utils.httpFormat
 
 @Composable
 fun ReportListScreen(
@@ -260,7 +261,8 @@ fun ReportItem(
 
                 // Title with overflow handling
                 BaseText(
-                    text = data.date ?: "-",
+                    // Default name to "Report" if name is null
+                    text = "Report ${data.id}",
                     fontFamily = FontType.SEMI_BOLD,
                     fontSize = 18.sp,
                     modifier = Modifier.weight(1f),
