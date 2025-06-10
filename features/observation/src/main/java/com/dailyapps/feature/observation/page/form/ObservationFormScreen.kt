@@ -390,8 +390,16 @@ fun ObservationFormContent(
         )
 
         // Date field
+        Text(
+            text = "Start Date",
+            fontFamily = fontLight,
+            fontSize = 16.sp,
+            color = Neutral900,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 16.dp)
+        )
         DateRangeButton(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier,
             text = displayDate.ifEmpty { stringResource(R.string.date) },
             label = stringResource(R.string.date),
             onClick = { showDatePicker = true },

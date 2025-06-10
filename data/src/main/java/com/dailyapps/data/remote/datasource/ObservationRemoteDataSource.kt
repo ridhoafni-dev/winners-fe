@@ -24,7 +24,13 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.net.toUri
+import com.dailyapps.data.mapper.AddActivityPlanCommentMapper
+import com.dailyapps.data.mapper.AddObservationCommentMapper
+import com.dailyapps.domain.usecase.AddActivityPlanCommentUseCase
+import com.dailyapps.domain.usecase.AddObservationCommentUseCase
 import com.dailyapps.domain.usecase.UpdateObservationUseCase
+import com.dailyapps.entity.ActivityPlanComment
+import com.dailyapps.entity.ObservationComments
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Singleton
@@ -33,6 +39,7 @@ class ObservationRemoteDataSource @Inject constructor(
     private val observationMapper: ObservationMapper,
     private val observationDetailMapper: ObservationDetailMapper,
     private val addObservationMapper: AddObservationMapper,
+    private val addObservationCommentMapper: AddObservationCommentMapper,
     @ApplicationContext private val context: Context
 ){
     suspend fun getObservationsByUserIdByDate(params: GetObservationsByUserIdByDateUseCase.Params) : Flow<Resource<List<Observation>>> {
@@ -91,7 +98,8 @@ class ObservationRemoteDataSource @Inject constructor(
                             val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
                             MultipartBody.Part.createFormData("image", it.name, requestFile)
                         }
-                    }                )
+                    }
+                )
             },
             addObservationMapper
         )
@@ -135,4 +143,20 @@ class ObservationRemoteDataSource @Inject constructor(
             else -> ".jpg" // Default extension
         }
     }
+
+    suspend fun addObservationComment(params: AddObservationCommentUseCase.Params): Flow<Resource<ObservationComments>> {
+        return mapFromApiResponse(
+            result = apiCall {
+                observationService.addObservationComment(
+                    token = params.token.formatToken(),
+                    id = params.id,
+                    userId = params.userId,
+                    rating = params.rating,
+                    comment = params.comment
+                )
+            },
+            addObservationCommentMapper
+        )
+    }
+
 }

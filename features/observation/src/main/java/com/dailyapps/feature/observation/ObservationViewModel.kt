@@ -2,6 +2,7 @@ package com.dailyapps.feature.observation
 
 import androidx.lifecycle.viewModelScope
 import com.dailyapps.common.utils.ViewModelState
+import com.dailyapps.domain.usecase.AddObservationCommentUseCase
 import com.dailyapps.domain.usecase.AddObservationUseCase
 import com.dailyapps.domain.usecase.GetObservationByIdUseCase
 import com.dailyapps.domain.usecase.GetObservationsByUserIdByDateUseCase
@@ -27,6 +28,7 @@ class ObservationViewModel @Inject constructor(
     private val getObservationByUseCase: GetObservationByIdUseCase,
     private val addObservation: AddObservationUseCase,
     private val updateObservation: UpdateObservationUseCase,
+    private val addObservationComment: AddObservationCommentUseCase,
     private val userUseCase: UserUseCase,
     private val masterUseCase: MasterUseCase
 ) : ViewModelState<ObservationState, ObservationAction>(
@@ -46,7 +48,8 @@ class ObservationViewModel @Inject constructor(
                     update {
                         copy(
                             userId = user.id?.toLong() ?: 0L,
-                            token = user.token ?: ""
+                            token = user.token ?: "",
+                            role = user.role ?: ""
                         )
                     }
                 }
@@ -106,6 +109,55 @@ class ObservationViewModel @Inject constructor(
             ObservationAction.OnResetState -> {
                 restartState()
             }
+
+            is ObservationAction.OnSubmitReview -> onSubmitComment(action.observationId, action.userId, action.rating, action.comment)
+        }
+    }
+
+
+    private fun onSubmitComment(id: Long, userId: Long, rating: Int, comment: String) {
+        viewModelScope.launch {
+            addObservationComment.execute(
+                AddObservationCommentUseCase.Params(
+                    id,
+                    userId,
+                    rating,
+                    comment,
+                    currentState().token
+                )
+            )
+                .collectLatest { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            update {
+                                copy(
+                                    isLoading = false,
+                                    isSuccess = true
+                                )
+                            }
+                        }
+
+                        is Resource.Error -> {
+                            update {
+                                copy(
+                                    isLoading = false,
+                                    isError = true,
+                                    errorMessage = resource.msg
+                                )
+                            }
+                        }
+
+                        Resource.Loading -> {
+                            update {
+                                copy(
+                                    isLoading = true,
+                                    isError = false,
+                                    errorMessage = ""
+                                )
+                            }
+                        }
+                    }
+                }
         }
     }
 

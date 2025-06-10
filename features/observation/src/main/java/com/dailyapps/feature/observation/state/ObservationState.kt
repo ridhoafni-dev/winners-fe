@@ -13,12 +13,19 @@ data class ObservationState(
     val errorMessage: String = "",
     val token: String = "",
     val userId: Long = 0L,
+    val role: String = "",
     val list: ObservationListState = ObservationListState(),
     val detail: ObservationDetailState = ObservationDetailState(),
     val add: FormObservationState = FormObservationState()
 ) {
     val isUserNotExist: Boolean
         get() = userId == 0L
+    val isUserLecturer: Boolean
+        get() = role == "LECTURER"
+    val isUserStudent: Boolean
+        get() = role == "STUDENT"
+    val isUserAdmin: Boolean
+        get() = role == "ADMIN"
 }
 
 data class ObservationDetailState(

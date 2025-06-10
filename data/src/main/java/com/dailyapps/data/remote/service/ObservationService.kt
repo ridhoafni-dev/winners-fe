@@ -1,10 +1,14 @@
 package com.dailyapps.data.remote.service
 
+import com.dailyapps.apiresponse.ActivityPlanCommentResponse
 import com.dailyapps.apiresponse.AddObservationResponse
 import com.dailyapps.apiresponse.BaseResponse
 import com.dailyapps.apiresponse.ObservationApiResponse
+import com.dailyapps.apiresponse.ObservationCommentsApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -55,4 +59,14 @@ interface ObservationService {
         @Part("lecturerId") lecturerId: RequestBody,
         @Part image: MultipartBody.Part?
     ): BaseResponse<AddObservationResponse>
+
+    @FormUrlEncoded
+    @POST("observations/comment/{id}")
+    suspend fun addObservationComment(
+        @Header("Authorization") token: String,
+        @Path("id") id: Long,
+        @Field("userId") userId: Long,
+        @Field("rating") rating: Int,
+        @Field("comment") comment: String
+    ): BaseResponse<ObservationCommentsApiResponse>
 }

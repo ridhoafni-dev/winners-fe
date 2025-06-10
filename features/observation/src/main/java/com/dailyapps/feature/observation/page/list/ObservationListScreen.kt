@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,6 +61,11 @@ fun ObservationListScreen(
     val state = viewModel.state.collectAsStateWithLifecycle()
     val currentState = state.value
 
+    // Check if the current user is a lecturer
+    val isUserLecturer = remember(currentState.role) {
+        currentState.isUserLecturer
+    }
+
     LaunchedEffect(currentState.list.startDate, currentState.list.endDate, currentState.token) {
         if (currentState.token.isEmpty() || currentState.isUserNotExist) return@LaunchedEffect
 
@@ -76,6 +82,7 @@ fun ObservationListScreen(
     ObservationListContent(
         navController = navController,
         state = state.value,
+        isUserLecturer = isUserLecturer,
         onDatePickerChange = { startDate, endDate ->
             viewModel.handleAction(
                 ObservationAction.OnUpdateDateRange(
@@ -99,7 +106,8 @@ fun ObservationListScreen(
 fun ObservationListContent(
     navController: NavHostController,
     state: ObservationState,
-    onDatePickerChange: (String, String) -> Unit
+    onDatePickerChange: (String, String) -> Unit,
+    isUserLecturer: Boolean = false,
 ) {
 
     Scaffold(
@@ -107,10 +115,12 @@ fun ObservationListContent(
             BaseAppBar(
                 title = stringResource(R.string.title_observation),
                 onClickBack = { navController.popBackStack() },
-                menuIconResource = commonR.drawable.ic_add,
+                menuIconResource = if (!isUserLecturer) commonR.drawable.ic_add else null,
                 elevation = 1.dp
             ) {
-                navController.navigate("${NavRoute.formObservationScreen}/0")
+                if (!isUserLecturer) {
+                    navController.navigate("${NavRoute.formObservationScreen}/0")
+                }
             }
         }
     ) { paddingValues ->
