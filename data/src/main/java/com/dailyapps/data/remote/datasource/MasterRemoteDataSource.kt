@@ -50,7 +50,7 @@ class MasterRemoteDataSource @Inject constructor(
     //endregion
     //region Teacher
 
-    suspend fun getAllTeachers(): Flow<Resource<List<Teacher>>> = flow {
+    fun getAllTeachers(): Flow<Resource<List<Teacher>>> = flow {
         runCatching {
             val apiResult = safeApiCall { masterService.getAllTeacher() }
             val apiResource: Resource<List<Teacher>> = when(apiResult) {

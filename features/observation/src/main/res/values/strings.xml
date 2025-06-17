@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_observation">Observasi</string>
+    <string name="title_observation_detail">Observation Detail</string>
+    <string name="title_observation_add">Add Observation</string>
+    <string name="name">Name</string>
+    <string name="description">Description</string>
+    <string name="date">Date</string>
+    <string name="lecturer">Lecturer</string>
+    <string name="submit">Submit</string>
+    <string name="title_observation_edit">Update Observation</string>
+    <string name="update">Update</string>
+</resources>

@@ -8,7 +8,7 @@ import javax.inject.Inject
 class UserInteractor @Inject constructor(
      private val userRepository: IUserRepository
 ): UserUseCase {
-    override suspend fun getUser(): Flow<User> = userRepository.getUser()
+    override fun getUser(): Flow<User> = userRepository.getUser()
 
     override suspend fun storeUser(user: User): Flow<Boolean> = userRepository.storeUser(user)
 

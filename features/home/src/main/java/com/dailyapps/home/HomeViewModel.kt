@@ -13,6 +13,7 @@ import com.dailyapps.entity.User
 import com.dailyapps.home.changepassword.ChangePasswordScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,10 +32,10 @@ class HomeViewModel @Inject constructor(
     private val changePasswordUseCase: ChangePasswordUseCase
     ) : ViewModel(){
 
-    private val _user = MutableStateFlow(User.EMPTY)
+    //private val _user = MutableStateFlow(User.EMPTY)
     private val _student = MutableStateFlow(Student.EMPTY)
 
-    internal val user get() = _user
+    //internal val user get() = _user
     internal val student get() = _student
 
     private val _changePassword = MutableStateFlow<ChangePasswordScreenState>(ChangePasswordScreenState.Empty)
@@ -48,11 +49,13 @@ class HomeViewModel @Inject constructor(
     private val _currentToken = MutableStateFlow("")
     private val currentToken get() = _currentToken
 
-    private val _currentTokenType = MutableStateFlow("")
-    private val currentTokenType get() = _currentTokenType
-
-    private val _currentTokenTypeStudentId = MutableStateFlow(Pair("", ""))
-    internal val currentTokenTypeStudentId get() = _currentTokenTypeStudentId
+     val user: StateFlow<User?> = userUseCase.getUser()
+            .flowOn(Dispatchers.IO)
+            .stateIn(
+                viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = null
+            )
 
     init {
         getLocal()
@@ -62,17 +65,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             userUseCase.getCurrentToken().onEach { token ->
                 _currentToken.value = token
-            }.flatMapConcat {
-                userUseCase.getCurrentTokenType().onEach { tokenType ->
-                    _currentTokenType.value = tokenType
-                }
-            }.collect {
-                combine(
-                    currentToken,
-                    currentTokenType
-                ) { token, tokenType ->
-                    _currentTokenTypeStudentId.value = Pair(token, tokenType)
-                }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.Eagerly, null)
             }
         }
     }
@@ -80,14 +72,8 @@ class HomeViewModel @Inject constructor(
     fun getUser() {
         viewModelScope.launch {
             userUseCase.getUser().collect {
-                _user.value = it
+                //_user.value = it
             }
-        }
-    }
-
-    internal fun getStudent() {
-        viewModelScope.launch {
-            //_student.value = masterUseCase.getStudentClass().data
         }
     }
 

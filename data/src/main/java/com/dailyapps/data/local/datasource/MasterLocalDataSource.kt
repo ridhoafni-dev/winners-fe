@@ -8,12 +8,19 @@ import com.dailyapps.data.local.room.entity.ClassRoomEntity
 import com.dailyapps.data.local.room.entity.SchoolYearEntity
 import com.dailyapps.data.local.room.entity.StudentEntity
 import com.dailyapps.data.local.room.entity.TeacherEntity
+import com.dailyapps.data.mapper.toTeacher
 import com.dailyapps.data.utils.DataMapper.toDomainClassRoom
 import com.dailyapps.data.utils.DataMapper.toDomainClassRooms
 import com.dailyapps.data.utils.DataMapper.toDomainSchoolYear
 import com.dailyapps.data.utils.DataMapper.toDomainSchoolYears
+import com.dailyapps.data.utils.DataMapper.toUser
 import com.dailyapps.domain.utils.Resource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -64,6 +71,14 @@ class MasterLocalDataSource @Inject constructor(
     suspend fun replaceAllStudents(entities: List<StudentEntity>) = studentDao.replaceAllStudent(entities);
 
     suspend fun getStudentClass() = studentDao.selectAllStudent()
+
+    fun getAllTeachersAsFlow() = flow {
+        teacherDao.selectALlTeacherAsFlow().collect { teachers ->
+            emit(teachers.map { it.toTeacher() })
+        }
+    }.catch {
+        Timber.e("LocalDataSource", "getAllTeachersAsFlow: failed=${it.message}")
+    }.flowOn(Dispatchers.IO)
 
     //endregion
 }

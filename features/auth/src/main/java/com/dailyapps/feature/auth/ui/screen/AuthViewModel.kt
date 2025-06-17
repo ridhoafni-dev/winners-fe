@@ -67,25 +67,25 @@ class AuthViewModel @Inject constructor(
                         is Resource.Error -> flowOf(Resource.Error(it.msg))
                     }
                 }
-                .flatMapConcat { userResource ->
-                    when (userResource) {
-                        is Resource.Success -> {
-                            val user = userResource.data
-                            if (user.isAdmin) flowOf(userResource)
-                            else loadInitialData("${user.tokenType} ${user.token}", user.id ?: 0)
-                                .flatMapConcat {
-                                    when (it) {
-                                        is Resource.Loading -> flowOf(Resource.Loading)
-                                        is Resource.Success ->  flowOf(userResource)
-                                        is Resource.Error -> flowOf(Resource.Error(it.msg))
-                                    }
-                                }
-                        }
-                        else -> {
-                            flowOf(userResource)
-                        }
-                    }
-                }
+//                .flatMapConcat { userResource ->
+//                    when (userResource) {
+//                        is Resource.Success -> { flowOf(userResource)
+//                            val user = userResource.data
+//                            if (user.isAdmin) flowOf(userResource)
+//                            else loadInitialData("${user.tokenType} ${user.token}", user.id ?: 0)
+//                                .flatMapConcat {
+//                                    when (it) {
+//                                        is Resource.Loading -> flowOf(Resource.Loading)
+//                                        is Resource.Success ->  flowOf(userResource)
+//                                        is Resource.Error -> flowOf(Resource.Error(it.msg))
+//                                    }
+//                                }
+//                        }
+//                        else -> {
+//                            flowOf(userResource)
+//                        }
+//                    }
+//                }
                 .filterNot { it is Resource.Loading }
                 .onStart { emit(Resource.Loading) }
                 .collect { result ->
@@ -109,18 +109,8 @@ class AuthViewModel @Inject constructor(
     private suspend fun loadInitialData(token: String, userId: Int): Flow<Resource<List<Student>>> =
         studentUseCase.execute(StudentUseCase.Params(token = token, userId = userId))
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun loadMasterData(): Flow<Resource<Any>> =
-        masterUserCase.getAllSchoolYears()
-        .flatMapConcat {
-            if (it is Resource.Success) masterUserCase.getAllTeacthers()
-            else flowOf(it)
-        }
-        .flatMapConcat {
-            if (it is Resource.Success) masterUserCase.getRemoteClassRooms()
-            else flowOf(it)
-        }
-
+        masterUserCase.getAllTeachers()
 
     fun storeUser(user: User) {
         viewModelScope.launch {

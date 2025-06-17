@@ -84,16 +84,29 @@ object DataMapper {
 
     fun User.toUserEntity() =
         UserEntity(
-            profilePhotoUrl, roles, username ?: "", name, id, email
+            role = role,
+            address = address,
+            nim = nim,
+            name = name,
+            stase = stase,
+            endSchoolYear = endSchoolYear,
+            id = id,
+            email = email,
+            startSchoolYear = startSchoolYear,
+            token = token
         )
 
     fun UserEntity.toUser() = User(
-        this.profilePhotoUrl,
-        this.roles,
-        this.name,
-        this.id,
-        this.email,
-        this.username,
+        role = role,
+        address = address,
+        nim = nim,
+        name = name,
+        stase = stase,
+        endSchoolYear = endSchoolYear,
+        id = id,
+        email = email,
+        startSchoolYear = startSchoolYear,
+        token = token
     )
 
     //endregion
@@ -125,13 +138,13 @@ object DataMapper {
             it.toDomainTeacher()
         }
 
-    private fun TeachersApiResponse.toDomainTeacher() = Teacher(nama, noHp, foto, updatedAt, createdAt, id, noGuru, jenisKelamin, deletedAt, alamat)
+    private fun TeachersApiResponse.toDomainTeacher() = Teacher(name, email, id , role)
 
     fun List<Teacher>.toEntityTeachers() = map {
         it.toEntityTeacher()
     }
 
-    private fun Teacher.toEntityTeacher() = TeacherEntity(nama, noHp, foto, updatedAt, createdAt, id, noGuru, jenisKelamin, deletedAt, alamat)
+    private fun Teacher.toEntityTeacher() = TeacherEntity(name, email, id, role)
 
     //endregion
     //region Score

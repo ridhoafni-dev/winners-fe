@@ -36,12 +36,13 @@ import com.dailyapps.common.fontMedium
 import com.dailyapps.common.fontRegular
 import com.dailyapps.common.utils.uppercaseFirstChar
 import com.dailyapps.entity.Student
+import com.dailyapps.entity.User
 import com.dailyapps.home.R
 
 @Composable
 fun HomeProfile(
     modifier: Modifier = Modifier,
-    user: Student? = null,
+    user: User? = null,
     onClickProfile:() -> Unit
 ) {
     Row(
@@ -55,7 +56,7 @@ fun HomeProfile(
         matrix.setToSaturation(0F)
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(if (user?.foto.isNullOrEmpty()) "https://bilpunkten.se/wp-content/uploads/2021/03/dummy-user-image-e1616512544203-1.png" else user?.foto)
+                .data("https://bilpunkten.se/wp-content/uploads/2021/03/dummy-user-image-e1616512544203-1.png")
                 .crossfade(true)
                 .build(),
             contentDescription = stringResource(R.string.image_profile),
@@ -83,7 +84,7 @@ fun HomeProfile(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, end = 8.dp),
-                text = user?.nama?.uppercaseFirstChar() ?: "",
+                text = user?.name?.uppercaseFirstChar() ?: "",
                 fontFamily = fontMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 20.sp

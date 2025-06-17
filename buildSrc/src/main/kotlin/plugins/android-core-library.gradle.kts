@@ -24,7 +24,7 @@ android{
         debug {
             isMinifyEnabled = false
             isShrinkResources = false
-            buildConfigField("String", "BASE_URL", "\"https://staging.smpsantoyosefduri.sch.id/api/\"")
+            buildConfigField("String", "BASE_URL", "\"http://192.168.147.78:8080/api/\"")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         release {

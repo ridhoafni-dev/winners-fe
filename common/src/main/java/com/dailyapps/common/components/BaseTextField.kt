@@ -1,10 +1,12 @@
 package com.dailyapps.common.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +48,9 @@ fun BaseTextField(
     enable: Boolean = true,
     isError: Boolean = false,
     errorMessage: String = "",
-    onValueChange: (String) -> Unit
+    isDate: Boolean = false,
+    onIconClick: () -> Unit = {},
+    onValueChange: (String) -> Unit,
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxWidth()) {
@@ -95,6 +99,15 @@ fun BaseTextField(
                         Icon(imageVector = image, contentDescription = null, tint = Placeholder)
                     }
                 }
+                if (isDate) {
+                    Icon(
+                        modifier = Modifier.clickable {
+                            onIconClick()
+                        },
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Select Date"
+                    )
+                }
             },
         )
 
@@ -113,5 +126,5 @@ fun BaseTextField(
 @Preview
 @Composable
 fun TextFieldGeneralPreview() {
-    BaseTextField(value="Password", onValueChange = {}, placeholder = "Masukan Nisn", title = "NISN", keyboardType = KeyboardType.Text)
+    BaseTextField(value="Password", onValueChange = {}, placeholder = "Masukan Nisn", title = "NISN", keyboardType = KeyboardType.Text, isDate = false, onIconClick = {})
 }

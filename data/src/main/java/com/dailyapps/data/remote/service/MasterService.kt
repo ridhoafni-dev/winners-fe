@@ -10,7 +10,7 @@ interface MasterService {
     @GET("tahun-ajaran")
     suspend fun getAllStudentYear(): BaseResponse<List<SchoolYearApiResponse>>
 
-    @GET("guru")
+    @GET("auth/lecturers")
     suspend fun getAllTeacher(): BaseResponse<List<TeachersApiResponse>>
 
     @GET("kelas")

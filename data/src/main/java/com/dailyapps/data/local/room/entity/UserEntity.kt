@@ -1,29 +1,21 @@
 package com.dailyapps.data.local.room.entity
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "user"
+    tableName = "user",
+    primaryKeys = ["id"]
 )
 data class UserEntity(
-    @ColumnInfo(name = "profile_photo_url")
-    val profilePhotoUrl: String? = null,
-
-    @ColumnInfo(name = "roles")
-    val roles: String? = null,
-
-    @ColumnInfo(name = "username")
-    @PrimaryKey
-    val username: String,
-
-    @ColumnInfo(name = "name")
-    val name: String? = null,
-
-    @ColumnInfo(name = "id")
     val id: Int? = null,
-
-    @ColumnInfo(name = "email")
+    val role: String? = null,
+    val address: String? = null,
+    val nim: String? = null,
+    val name: String? = null,
+    val stase: String? = null,
+    val endSchoolYear: Int? = null,
     val email: String? = null,
+    val startSchoolYear: Int? = null,
+    val token: String? = null
 )

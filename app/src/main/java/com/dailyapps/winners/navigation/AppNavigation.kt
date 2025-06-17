@@ -9,12 +9,14 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.dailyapps.common.utils.NavRoute
 import com.dailyapps.common.utils.toLocalDateTime
 import com.dailyapps.feature.absent.AbsentScreen
 import com.dailyapps.feature.absent.AbsentViewModel
+import com.dailyapps.feature.activty_plan.ActivityPlanViewModel
+import com.dailyapps.feature.activty_plan.page.detail.ActivityPlanDetailScreen
+import com.dailyapps.feature.activty_plan.page.form.ActivityPlanFormScreen
+import com.dailyapps.feature.activty_plan.page.list.ActivityPlanListScreen
 import com.dailyapps.feature.auth.MainViewModel
 import com.dailyapps.feature.auth.ui.screen.AuthViewModel
 import com.dailyapps.feature.auth.ui.screen.login.LoginScreen
@@ -28,6 +30,12 @@ import com.dailyapps.feature.exam.pages.token.TokenPage
 import com.dailyapps.feature.exam.pages.token.TokenPageViewModel
 import com.dailyapps.feature.note.NoteScreen
 import com.dailyapps.feature.note.NoteViewModel
+import com.dailyapps.feature.observation.ObservationViewModel
+import com.dailyapps.feature.observation.page.detail.ObservationDetailScreen
+import com.dailyapps.feature.observation.page.form.ObservationFormScreen
+import com.dailyapps.feature.observation.page.list.ObservationListScreen
+import com.dailyapps.feature.report.ReportViewModel
+import com.dailyapps.feature.report.page.list.ReportListScreen
 import com.dailyapps.home.HomeViewModel
 import com.dailyapps.home.changepassword.ChangePasswordScreen
 import com.dailyapps.home.dashboard.HomeScreen
@@ -37,6 +45,8 @@ import com.dailyapps.home.visi.VisiMisiScreen
 import com.dailyapps.score.ui.screen.ScoreViewModel
 import com.dailyapps.score.ui.screen.detail.ScoreDetailScreen
 import com.dailyapps.score.ui.screen.main.ScoreScreen
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +62,7 @@ fun AppNavigation() {
     isLoggedIn?.let { loggedIn ->
         AnimatedNavHost(
             navController = navController,
-            startDestination = if (loggedIn) NavRoute.homeScreen else NavRoute.homeScreen
+            startDestination = if (loggedIn) NavRoute.homeScreen else NavRoute.loginScreen
         ) {
             composableWithSlideAnimation(
                 route = NavRoute.loginScreen
@@ -69,6 +79,7 @@ fun AppNavigation() {
                 route = NavRoute.homeScreen
             ) {
                 val homeViewModel: HomeViewModel = hiltViewModel()
+
                 HomeScreen(navController, homeViewModel)
             }
             composableWithSlideAnimation(
@@ -153,8 +164,8 @@ fun AppNavigation() {
                     navController, tokenPageViewModel, token, authToken, ujianId, siswaId, ujianEnd, matpel
                 )
             }
+
             composableWithSlideAnimation(
-//                route = NavRoute.testExamScreen,
                 route = "${NavRoute.testExamScreen}/{authToken}/{ujianId}/{siswaId}/{ujianEnd}/{matpel}",
                 arguments = listOf(
                     navArgument("authToken") { type = NavType.StringType },
@@ -187,11 +198,110 @@ fun AppNavigation() {
                     matpel
                 )
             }
+
             composableWithSlideAnimation(
                 route = NavRoute.visiMisiScreen
             ) {
                 VisiMisiScreen(navController)
             }
+
+            composableWithSlideAnimation(
+                route = NavRoute.observationScreen,
+            ) { _ ->
+                val observationViewModel: ObservationViewModel = hiltViewModel()
+
+                ObservationListScreen(
+                    navController,
+                    observationViewModel
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.observationDetailScreen}/{observationId}",
+                arguments = listOf(
+                    navArgument("observationId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
+                val observationViewModel: ObservationViewModel = hiltViewModel()
+                val observationId = navBackStackEntry.arguments?.getInt("observationId") ?: 0
+
+                ObservationDetailScreen(
+                    navController,
+                    observationId.toLong(),
+                    observationViewModel
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.formObservationScreen}/{observationId}",
+                arguments = listOf(
+                navArgument("observationId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
+                val observationViewModel: ObservationViewModel = hiltViewModel()
+                val observationId = navBackStackEntry.arguments?.getInt("observationId") ?: 0
+
+                ObservationFormScreen(
+                    navController,
+                    observationViewModel,
+                    observationId.toLong(),
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.formActivityPlanScreen}/{activityPlanId}",
+                arguments = listOf(
+                navArgument("activityPlanId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
+                val activityPlanViewModel: ActivityPlanViewModel = hiltViewModel()
+                val activityPlanId = navBackStackEntry.arguments?.getInt("activityPlanId") ?: 0
+
+                ActivityPlanFormScreen(
+                    navController,
+                    activityPlanViewModel,
+                    activityPlanId.toLong(),
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.activityPlanDetailScreen}/{activityPlanId}",
+                arguments = listOf(
+                    navArgument("activityPlanId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
+                val activityPlanViewModel: ActivityPlanViewModel = hiltViewModel()
+                val activityPlanId = navBackStackEntry.arguments?.getInt("activityPlanId") ?: 0
+
+                ActivityPlanDetailScreen(
+                    navController,
+                    activityPlanId.toLong(),
+                    activityPlanViewModel
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = NavRoute.activityPlanScreen,
+            ) { _ ->
+                val activityPlanViewModel: ActivityPlanViewModel = hiltViewModel()
+
+                ActivityPlanListScreen(
+                    navController,
+                    activityPlanViewModel
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = NavRoute.reportScreen,
+            ) { _ ->
+                val reportViewModel: ReportViewModel = hiltViewModel()
+
+                ReportListScreen(
+                    navController,
+                    reportViewModel
+                )
+            }
+
         }
     }
 }
