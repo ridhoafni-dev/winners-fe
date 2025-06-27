@@ -35,6 +35,7 @@ import com.dailyapps.feature.observation.page.detail.ObservationDetailScreen
 import com.dailyapps.feature.observation.page.form.ObservationFormScreen
 import com.dailyapps.feature.observation.page.list.ObservationListScreen
 import com.dailyapps.feature.report.ReportViewModel
+import com.dailyapps.feature.report.page.form.ReportFormScreen
 import com.dailyapps.feature.report.page.list.ReportListScreen
 import com.dailyapps.home.HomeViewModel
 import com.dailyapps.home.changepassword.ChangePasswordScreen
@@ -299,6 +300,22 @@ fun AppNavigation() {
                 ReportListScreen(
                     navController,
                     reportViewModel
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.formReportScreen}/{reportId}",
+                arguments = listOf(
+                    navArgument("reportId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
+                val viewModel: ReportViewModel = hiltViewModel()
+                val reportId = navBackStackEntry.arguments?.getInt("reportId") ?: 0
+
+                ReportFormScreen(
+                    navController,
+                    viewModel,
+                    reportId.toLong(),
                 )
             }
 

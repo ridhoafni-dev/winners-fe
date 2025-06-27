@@ -3,14 +3,21 @@ package com.dailyapps.feature.report
 import androidx.lifecycle.viewModelScope
 import com.dailyapps.common.utils.ViewModelState
 import com.dailyapps.domain.usecase.DownloadReportUseCase
+import com.dailyapps.domain.usecase.GetReportByIdUseCase
 import com.dailyapps.domain.usecase.GetReportsByUserIdByDateUseCase
+import com.dailyapps.domain.usecase.MasterUseCase
+import com.dailyapps.domain.usecase.PostReportUseCase
+import com.dailyapps.domain.usecase.UpdateReportUseCase
 import com.dailyapps.domain.usecase.UserUseCase
 import com.dailyapps.domain.utils.Resource
 import com.dailyapps.feature.report.state.ReportAction
 import com.dailyapps.feature.report.state.ReportState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +26,11 @@ import javax.inject.Inject
 class ReportViewModel @Inject constructor(
     private val getReportsByUserIdByDate: GetReportsByUserIdByDateUseCase,
     private val downloadReportUseCase: DownloadReportUseCase,
-    private val userUseCase: UserUseCase
+    private val postReportUseCase: PostReportUseCase,
+    private val getReportByIdUseCase: GetReportByIdUseCase,
+    private val updateReportUseCase: UpdateReportUseCase,
+    private val userUseCase: UserUseCase,
+    private val masterUseCase: MasterUseCase
 ) : ViewModelState<ReportState, ReportAction>(
     initialState = ReportState()
 ) {
@@ -28,6 +39,7 @@ class ReportViewModel @Inject constructor(
         getLocal()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getLocal() {
         viewModelScope.launch {
             userUseCase.getUser()
@@ -41,7 +53,14 @@ class ReportViewModel @Inject constructor(
                         )
                     }
                 }
-                .collectLatest {}
+                .flatMapLatest { user ->
+                    val token = user.token ?: ""
+                    if (token.isNotEmpty()) masterUseCase.getAllTeachersAsFlow()
+                    else flowOf(emptyList())
+                }
+                .collectLatest { teachers ->
+                    update { copy(form = form.copy(lecturers = teachers)) }
+                }
         }
     }
 
@@ -82,6 +101,24 @@ class ReportViewModel @Inject constructor(
             is ReportAction.OnResetState -> {
                 restartState()
             }
+
+            is ReportAction.OnReportValueChange -> {
+                update {
+                    copy(
+                        form = form.copy(
+                            date = action.date,
+                            lecturerId = action.lecturerId,
+                            documentUri = action.documentUri ?: ""
+                        )
+                    )
+                }
+            }
+
+            is ReportAction.OnSubmitReport -> onSubmitReport()
+
+            is ReportAction.OnGetReport -> getReportById(action.id, action.token)
+
+            is ReportAction.OnUpdateReport -> onUpdateReport(action.id)
         }
     }
 
@@ -112,6 +149,139 @@ class ReportViewModel @Inject constructor(
                                     ),
                                     isSuccess = true,
                                     isEmpty = resource.data.isEmpty()
+                                )
+                            }
+                        }
+
+                        is Resource.Error -> {
+                            update {
+                                copy(
+                                    isLoading = false,
+                                    isError = true,
+                                    errorMessage = resource.msg
+                                )
+                            }
+                        }
+
+                        Resource.Loading -> {
+                            update {
+                                copy(
+                                    isLoading = true,
+                                    isError = false,
+                                    errorMessage = ""
+                                )
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun onSubmitReport() {
+        viewModelScope.launch {
+            postReportUseCase.execute(
+                PostReportUseCase.Params(
+                    currentState().userId,
+                    currentState().form.date,
+                    currentState().form.lecturerId,
+                    currentState().form.documentUri,
+                    currentState().token
+                )
+            )
+                .collectLatest { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            update {
+                                copy(
+                                    isLoading = false,
+                                    isSuccess = true
+                                )
+                            }
+                        }
+
+                        is Resource.Error -> {
+                            update {
+                                copy(
+                                    isLoading = false,
+                                    isError = true,
+                                    errorMessage = resource.msg
+                                )
+                            }
+                        }
+
+                        Resource.Loading -> {
+                            update {
+                                copy(
+                                    isLoading = true,
+                                    isError = false,
+                                    errorMessage = ""
+                                )
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun getReportById(id: Long, token: String) {
+        viewModelScope.launch {
+            getReportByIdUseCase.execute(GetReportByIdUseCase.Params(id, token))
+                .collectLatest { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            update {
+                                copy(
+                                    isLoading = false,
+                                    detail = detail.copy(
+                                        report = resource.data
+                                    )
+                                )
+                            }
+                        }
+
+                        is Resource.Error -> {
+                            update {
+                                copy(
+                                    isLoading = false,
+                                    isError = true,
+                                    errorMessage = resource.msg
+                                )
+                            }
+                        }
+
+                        Resource.Loading -> {
+                            update {
+                                copy(
+                                    isLoading = true,
+                                    isError = false,
+                                    errorMessage = ""
+                                )
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun onUpdateReport(id: Long) {
+        viewModelScope.launch {
+            updateReportUseCase.execute(
+                UpdateReportUseCase.Params(
+                    id,
+                    currentState().userId,
+                    currentState().form.date,
+                    currentState().form.lecturerId,
+                    currentState().form.documentUri,
+                    currentState().token
+                )
+            )
+                .collectLatest { resource ->
+                    when (resource) {
+                        is Resource.Success -> {
+                            update {
+                                copy(
+                                    isLoading = false,
+                                    isSuccess = true
                                 )
                             }
                         }

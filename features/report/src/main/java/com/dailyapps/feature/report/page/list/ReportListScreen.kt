@@ -61,7 +61,8 @@ import com.dailyapps.feature.report.state.ReportAction
 import com.dailyapps.feature.report.state.ReportState
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
-import com.dailyapps.common.utils.httpFormat
+import com.dailyapps.common.R as commonR
+import com.dailyapps.common.utils.NavRoute
 
 @Composable
 fun ReportListScreen(
@@ -73,6 +74,11 @@ fun ReportListScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    // Check if the current user is a lecturer
+    val isUserLecturer = remember(currentState.role) {
+        currentState.isUserLecturer
+    }
 
     LaunchedEffect(currentState.list.startDate, currentState.list.endDate, currentState.token) {
         if (currentState.token.isEmpty() || currentState.isUserNotExist) return@LaunchedEffect
@@ -121,6 +127,7 @@ fun ReportListScreen(
     ListContent(
         navController = navController,
         state = state.value,
+        isUserLecturer = isUserLecturer,
         snackbarHostState = snackbarHostState,
         onDatePickerChange = { startDate, endDate ->
             viewModel.handleAction(
@@ -154,6 +161,7 @@ fun ReportListScreen(
 fun ListContent(
     navController: NavHostController,
     state: ReportState,
+    isUserLecturer: Boolean = false,
     snackbarHostState: SnackbarHostState,
     onDatePickerChange: (String, String) -> Unit,
     onDownloadReport: (Long) -> Unit,
@@ -165,9 +173,13 @@ fun ListContent(
             BaseAppBar(
                 title = stringResource(R.string.reports_title),
                 onClickBack = { navController.popBackStack() },
-                elevation = 1.dp,
-                onMenuClick = {}
-            )
+                menuIconResource = if (!isUserLecturer) commonR.drawable.ic_add else null,
+                elevation = 1.dp
+            ) {
+                if (!isUserLecturer) {
+                    navController.navigate("${NavRoute.formReportScreen}/0")
+                }
+            }
         }
     ) { paddingValues ->
         Box(

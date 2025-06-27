@@ -2,6 +2,7 @@ package com.dailyapps.feature.report.state
 
 import com.dailyapps.common.utils.DateUtil
 import com.dailyapps.entity.Report
+import com.dailyapps.entity.Teacher
 
 data class ReportState(
     val isLoading: Boolean = false,
@@ -14,6 +15,8 @@ data class ReportState(
     val userId: Long = 0L,
     val role: String = "",
     val list: ReportListState = ReportListState(),
+    val form: FormReportState = FormReportState(),
+    val detail: ReportDetailState = ReportDetailState(),
     val downloading: Boolean = false,
     val downloadSuccess: Boolean = false,
     val downloadError: Boolean = false,
@@ -35,4 +38,15 @@ data class ReportListState(
     val startDate: String = DateUtil.getLastWeekDate(),
     val endDate: String = DateUtil.getCurrentDate(),
     val reports: List<Report> = emptyList(),
+)
+
+data class FormReportState(
+    val lecturers: List<Teacher> = emptyList(),
+    val date: String = DateUtil.getCurrentDate(),
+    val lecturerId: Long = 0L,
+    val documentUri: String = ""
+)
+
+data class ReportDetailState(
+    val report: Report = Report()
 )

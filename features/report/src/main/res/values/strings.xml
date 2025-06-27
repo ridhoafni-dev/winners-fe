@@ -5,4 +5,10 @@
     <string name="downloading">Downloading...</string>
     <string name="download_success">Download Successful</string>
     <string name="download_error">Download Failed</string>
+    <string name="title_report_add">Add Report</string>
+    <string name="lecturer">Lecturer</string>
+    <string name="date">Date</string>
+    <string name="submit">Submit</string>
+    <string name="update">Update</string>
+    <string name="title_report_edit">Update Report</string>
 </resources>
