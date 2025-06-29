@@ -171,6 +171,7 @@ fun ReportFormContent(
     val context = LocalContext.current
 
     val currentState = state.form
+    val detailState = state.detail
     val isLoading = state.isLoading
     val isError = state.isError
     val errorMessage = state.errorMessage
@@ -178,7 +179,7 @@ fun ReportFormContent(
 
     // Form state
     val date = currentState.date
-    val selectedLecture = currentState.lecturerId
+    val selectedLecture = detailState.report.reportLecturer?.id?.toLong() ?: 0L
     var documentUri by remember { mutableStateOf<Uri?>(null) }
 
     var showDatePicker by remember { mutableStateOf(false) }

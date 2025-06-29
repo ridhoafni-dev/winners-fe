@@ -1,7 +1,6 @@
 package com.dailyapps.feature.report.page.list
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,9 +22,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -41,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.dailyapps.common.EmptyList
@@ -54,15 +56,14 @@ import com.dailyapps.common.components.ErrorUi
 import com.dailyapps.common.components.FontType
 import com.dailyapps.common.components.LoadingUi
 import com.dailyapps.common.utils.DateTime.Companion.formatDate
+import com.dailyapps.common.utils.NavRoute
 import com.dailyapps.entity.Report
 import com.dailyapps.feature.report.R
 import com.dailyapps.feature.report.ReportViewModel
 import com.dailyapps.feature.report.state.ReportAction
 import com.dailyapps.feature.report.state.ReportState
 import kotlinx.coroutines.launch
-import androidx.core.net.toUri
 import com.dailyapps.common.R as commonR
-import com.dailyapps.common.utils.NavRoute
 
 @Composable
 fun ReportListScreen(
@@ -153,6 +154,11 @@ fun ReportListScreen(
                 )
             )
         },
+        onEditReport = { report ->
+            report.id?.let { reportId ->
+                navController.navigate("${NavRoute.formReportScreen}/${reportId}")
+            }
+        },
         onRetry = onRetry
     )
 }
@@ -165,6 +171,7 @@ fun ListContent(
     snackbarHostState: SnackbarHostState,
     onDatePickerChange: (String, String) -> Unit,
     onDownloadReport: (Long) -> Unit,
+    onEditReport: (Report) -> Unit,
     onRetry: () -> Unit = {}
 ) {
     Scaffold(
@@ -213,7 +220,8 @@ fun ListContent(
                 } else {
                     ContentList(
                         reports = state.list.reports,
-                        onItemClick = { report ->
+                        onItemClick = onEditReport,
+                        onDownloadClick = { report ->
                             report.id?.let { onDownloadReport(it.toLong()) }
                         }
                     )
@@ -224,15 +232,21 @@ fun ListContent(
 }
 
 @Composable
-fun ContentList(reports: List<Report>, onItemClick: (Report) -> Unit = {}) {
+fun ContentList(
+    reports: List<Report>,
+    onItemClick: (Report) -> Unit = {},
+    onDownloadClick: (Report) -> Unit = {}
+) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
         items(reports) { report ->
-            ReportItem(data = report) { reportParam ->
-                onItemClick(reportParam)
-            }
+            ReportItem(
+                data = report,
+                onItemClick = onItemClick,
+                onDownloadClick = onDownloadClick
+            )
         }
     }
 }
@@ -242,6 +256,7 @@ fun ReportItem(
     data: Report,
     modifier: Modifier = Modifier,
     onItemClick: (Report) -> Unit = {},
+    onDownloadClick: (Report) -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -317,15 +332,35 @@ fun ReportItem(
                 )
             }
 
-            // Download prompt
-            Spacer(modifier = Modifier.height(4.dp))
-            BaseText(
-                text = stringResource(R.string.download_report),
-                fontFamily = FontType.MEDIUM,
-                fontSize = 12.sp,
-                fontColor = Primary500,
-                modifier = Modifier.align(Alignment.End)
-            )
+            // Action row with download icon
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Edit button hint
+                BaseText(
+                    text = stringResource(R.string.tap_to_edit),
+                    fontFamily = FontType.REGULAR,
+                    fontSize = 12.sp,
+                    fontColor = Neutral300,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+
+                // Download button
+                IconButton(
+                    onClick = { onDownloadClick(data) },
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Download,
+                        contentDescription = stringResource(R.string.download_report),
+                        tint = Primary500,
+                    )
+                }
+            }
         }
     }
 }

@@ -14,13 +14,13 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ReportsService {
-    @GET("reports")
+    @GET("reports/{id}/{startDate}/{endDate}/{lecturer}")
     suspend fun getReportsByUserIdByDate(
         @Header("Authorization") token: String,
-        @Query("id") userId: Long,
-        @Query("startDate") startDate: String,
-        @Query("endDate") endDate: String,
-        @Query("lecturer") lecturer: Boolean,
+        @Path("id") userId: Long,
+        @Path("startDate") startDate: String,
+        @Path("endDate") endDate: String,
+        @Path("lecturer") lecturer: Boolean,
     ): BaseResponse<List<ReportApiResponse>>
 
     @GET("reports/download/{id}")

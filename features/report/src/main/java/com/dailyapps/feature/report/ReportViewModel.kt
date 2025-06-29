@@ -229,11 +229,16 @@ class ReportViewModel @Inject constructor(
                 .collectLatest { resource ->
                     when (resource) {
                         is Resource.Success -> {
+                            val data = resource.data
+
                             update {
                                 copy(
                                     isLoading = false,
                                     detail = detail.copy(
-                                        report = resource.data
+                                        report = data
+                                    ),
+                                    form = form.copy(
+                                        lecturerId = data.reportLecturer?.id?.toLong() ?: 0L,
                                     )
                                 )
                             }

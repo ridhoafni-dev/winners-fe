@@ -5,6 +5,7 @@ import com.dailyapps.apiresponse.BaseResponse
 import com.dailyapps.apiresponse.ReportApiResponse
 import com.dailyapps.data.utils.Mapper
 import com.dailyapps.entity.Report
+import com.dailyapps.entity.ReportLecturer
 import javax.inject.Inject
 
 class SingleReportMapper @Inject constructor() :
@@ -14,8 +15,13 @@ class SingleReportMapper @Inject constructor() :
         return Report(
             date = response.date,
             image = response.image,
-            id = response.id?.toInt(),
-            createAt = response.date
+            id = response.id,
+            createAt = response.date,
+            reportLecturer = ReportLecturer(
+                reportId = response.reportLecturer?.reportId,
+                id = response.reportLecturer?.id,
+                userId = response.reportLecturer?.userId
+            ),
         )
     }
 }
