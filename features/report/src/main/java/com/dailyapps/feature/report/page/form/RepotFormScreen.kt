@@ -71,6 +71,7 @@ import com.dailyapps.feature.report.state.ReportState
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.text.toLong
 
 @Composable
 fun ReportFormScreen(
@@ -179,7 +180,9 @@ fun ReportFormContent(
 
     // Form state
     val date = currentState.date
-    val selectedLecture = detailState.report.reportLecturer?.id?.toLong() ?: 0L
+    var selectedLecture by remember(detailState.report.reportLecturer?.id) {
+        mutableStateOf(detailState.report.reportLecturer?.id?.toLong() ?: 0L)
+    }
     var documentUri by remember { mutableStateOf<Uri?>(null) }
 
     var showDatePicker by remember { mutableStateOf(false) }
@@ -340,6 +343,8 @@ fun ReportFormContent(
             onValueChange = { selectedName ->
                 lecturers.find { it.name == selectedName }?.let { lecturer ->
                     selectedLecturerName = selectedName // Update immediately for UI responsiveness
+                    val lecturerId = lecturer.id?.toLong() ?: 0L
+                    selectedLecture = lecturerId // Update the local state variable
                     onValueChanged(
                         date, lecturer.id?.toLong() ?: 0L, currentState.documentUri.ifEmpty { documentUri?.toString() }
                     )
@@ -552,7 +557,7 @@ fun ReportFormContent(
             isLoading = isLoading,
             enabled = !isLoading &&
                      ((documentUri != null) || (isRemoteDocument && currentState.documentUri.isNotEmpty())) &&
-                     selectedLecture > 0
+                    selectedLecturerName.isNotEmpty()
         ) {
             onSubmit()
         }

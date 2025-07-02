@@ -105,7 +105,7 @@ class ReportsRemoteDataSource @Inject constructor(
 
     suspend fun updateReport(params: UpdateReportUseCase.Params): Flow<Resource<Report>> {
         // Handle both remote URLs and local file URIs
-        val uri = if (params.documentUri.startsWith("http")) {
+        val uri = if (params.documentUri.contains("document/")) {
             null // It's a remote URL, we won't upload a new file
         } else {
             params.documentUri.toUri()
@@ -117,16 +117,10 @@ class ReportsRemoteDataSource @Inject constructor(
         val datePart = params.date.toRequestBody("text/plain".toMediaTypeOrNull())
 
         // Create file part if we have a local URI
-        val filePart = if (uri != null) {
+        val filePart = uri?.let {
             val file = getFileFromUri(uri)
             val requestFile = file.asRequestBody("application/octet-stream".toMediaTypeOrNull())
             MultipartBody.Part.createFormData("document", file.name, requestFile)
-        } else {
-            // Create an empty part or a part with the URL if no file is being uploaded
-            // This assumes the backend can handle an empty file part when no new file is being uploaded
-            val emptyBytes = ByteArray(0)
-            val requestBody = emptyBytes.toRequestBody("application/octet-stream".toMediaTypeOrNull(), 0, 0)
-            MultipartBody.Part.createFormData("document", "", requestBody)
         }
 
         return mapFromApiResponse(

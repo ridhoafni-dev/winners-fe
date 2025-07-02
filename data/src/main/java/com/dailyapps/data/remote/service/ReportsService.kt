@@ -47,7 +47,7 @@ interface ReportsService {
         @Part("userId") userId: RequestBody,
         @Part("lecturerId") lecturerId: RequestBody,
         @Part("date") date: RequestBody,
-        @Part document: MultipartBody.Part
+        @Part document: MultipartBody.Part?
     ): BaseResponse<ReportApiResponse>
 
     @GET("reports/{id}")
