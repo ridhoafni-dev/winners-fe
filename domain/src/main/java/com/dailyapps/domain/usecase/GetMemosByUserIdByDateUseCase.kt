@@ -12,6 +12,7 @@ class GetMemosByUserIdByDateUseCase @Inject constructor(private val repository: 
     }
 
     data class Params(
+        val token: String,
         val userId: Long,
         val startDate: String,
         val endDate: String,

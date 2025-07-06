@@ -8,6 +8,7 @@ import com.dailyapps.data.repository.AuthRepository
 import com.dailyapps.data.repository.ExamQuestionRepository
 import com.dailyapps.data.repository.ExamRepository
 import com.dailyapps.data.repository.MasterRepository
+import com.dailyapps.data.repository.MemoRepository
 import com.dailyapps.data.repository.NoteRepository
 import com.dailyapps.data.repository.ObservationRepository
 import com.dailyapps.data.repository.ReportsRepository
@@ -20,6 +21,7 @@ import com.dailyapps.domain.repository.IAuthRepository
 import com.dailyapps.domain.repository.IExamQuestionRepository
 import com.dailyapps.domain.repository.IExamRepository
 import com.dailyapps.domain.repository.IMasterRepository
+import com.dailyapps.domain.repository.IMemoRepository
 import com.dailyapps.domain.repository.INoteRepository
 import com.dailyapps.domain.repository.IObservationRepository
 import com.dailyapps.domain.repository.IReportsRepository
@@ -95,6 +97,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideReportRepository(reportsRepository: ReportsRepository): IReportsRepository
+
+  @Binds
+    @Singleton
+    abstract fun provideMemoRepository(memosRepository: MemoRepository): IMemoRepository
 
 //    @Binds
 //    @Singleton

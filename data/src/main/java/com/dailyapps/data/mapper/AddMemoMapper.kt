@@ -15,13 +15,8 @@ class AddMemoMapper @Inject constructor() : Mapper<BaseResponse<AddMemoResponse>
     override fun mapFromApiResponse(type: BaseResponse<AddMemoResponse>): Memo {
         val response = type.data
         return Memo(
-            id = response.id,
             title = response.title,
-            active = response.active,
             userId = response.userId,
-            endDate = response.endDate,
-            startDate = response.startDate,
-            status = response.status
         )
     }
 }

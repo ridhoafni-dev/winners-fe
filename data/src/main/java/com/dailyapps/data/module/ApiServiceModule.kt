@@ -6,6 +6,7 @@ import com.dailyapps.data.remote.service.AuthService
 import com.dailyapps.data.remote.service.ExamQuestionService
 import com.dailyapps.data.remote.service.ExamService
 import com.dailyapps.data.remote.service.MasterService
+import com.dailyapps.data.remote.service.MemoService
 import com.dailyapps.data.remote.service.NoteService
 import com.dailyapps.data.remote.service.ObservationService
 import com.dailyapps.data.remote.service.ReportsService
@@ -83,6 +84,12 @@ class ApiServiceModule {
     @Singleton
     fun provideReportsService(retrofit: Retrofit): ReportsService {
         return retrofit.create(ReportsService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMemosService(retrofit: Retrofit): MemoService {
+        return retrofit.create(MemoService::class.java)
     }
 
 }

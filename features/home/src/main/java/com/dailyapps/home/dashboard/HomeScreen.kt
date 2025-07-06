@@ -123,7 +123,7 @@ fun ListHomeMenu(selected: String, navController: NavHostController) {
 
                         "Memos" -> {
                             Handler(Looper.getMainLooper()).postDelayed({
-                                navController.navigate(NavRoute.scoreScreen)
+                                navController.navigate(NavRoute.memoListScreen)
                             }, 200)
                         }
 

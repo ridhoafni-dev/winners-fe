@@ -12,7 +12,8 @@ class AddMemoCommentUseCase @Inject constructor(private val repository: IMemoRep
     }
 
     data class Params(
-        val memoId: Long,
+        val token: String,
+        val id: Long,
         val userId: Long,
         val comment: String,
         val rating: Int

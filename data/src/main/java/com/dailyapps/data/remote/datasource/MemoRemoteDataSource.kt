@@ -1,105 +1,113 @@
 package com.dailyapps.data.remote.datasource
 
-import com.dailyapps.apiresponse.AddMemoResponse
-import com.dailyapps.apiresponse.BaseResponse
-import com.dailyapps.apiresponse.MemoApiResponse
+import com.dailyapps.common.utils.formatToken
 import com.dailyapps.data.mapper.AddMemoMapper
 import com.dailyapps.data.mapper.MemoDetailMapper
 import com.dailyapps.data.mapper.MemoMapper
 import com.dailyapps.data.remote.service.MemoService
-import com.dailyapps.data.utils.TokenInterceptor
+import com.dailyapps.data.utils.apiCall
+import com.dailyapps.data.utils.mapFromApiResponse
+import com.dailyapps.domain.usecase.AddMemoUseCase
+import com.dailyapps.domain.usecase.GetMemoByIdUseCase
+import com.dailyapps.domain.usecase.GetMemosByUserIdByDateUseCase
+import com.dailyapps.domain.usecase.UpdateMemoUseCase
+import com.dailyapps.domain.usecase.AddMemoCommentUseCase
+import com.dailyapps.domain.utils.Resource
 import com.dailyapps.entity.Memo
+import com.dailyapps.entity.MemoComment
+import com.dailyapps.data.mapper.AddMemoCommentMapper
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Remote data source for memo related operations
  */
+@Singleton
 class MemoRemoteDataSource @Inject constructor(
     private val memoService: MemoService,
     private val memoMapper: MemoMapper,
     private val memoDetailMapper: MemoDetailMapper,
     private val addMemoMapper: AddMemoMapper,
-    private val tokenInterceptor: TokenInterceptor
+    private val addMemoCommentMapper: AddMemoCommentMapper,
 ) {
     /**
      * Get memos by user ID and date range
      */
-    suspend fun getMemosByUserIdByDate(
-        userId: Long,
-        startDate: String,
-        endDate: String,
-        lecturer: Boolean,
-    ): List<Memo> {
-        val token = tokenInterceptor.getToken()
-        val response: BaseResponse<List<MemoApiResponse>> = memoService.getMemosByUserIdByDate(
-            token = token,
-            userId = userId,
-            startDate = startDate,
-            endDate = endDate,
-            lecturer = lecturer
+    suspend fun getMemosByUserIdByDate(params: GetMemosByUserIdByDateUseCase.Params): Flow<Resource<List<Memo>>> {
+        return mapFromApiResponse(
+            result = apiCall {
+                memoService.getMemosByUserIdByDate(
+                    params.token.formatToken(),
+                    params.userId,
+                    params.startDate,
+                    params.endDate,
+                    params.lecturer
+                )
+            }, memoMapper
         )
-        return memoMapper.mapFromApiResponse(response)
     }
 
     /**
      * Get memo by ID
      */
-    suspend fun getMemoById(id: Long): Memo {
-        val token = tokenInterceptor.getToken()
-        val response: BaseResponse<MemoApiResponse> = memoService.getMemoById(
-            token = token,
-            id = id
+    suspend fun getMemoById(params: GetMemoByIdUseCase.Params): Flow<Resource<Memo>> {
+        return mapFromApiResponse(
+            result = apiCall {
+                memoService.getMemoById(
+                    params.token.formatToken(),
+                    params.id
+                )
+            }, memoDetailMapper
         )
-        return memoDetailMapper.mapFromApiResponse(response)
     }
 
     /**
      * Add a new memo
      */
-    suspend fun addMemo(
-        userId: Long,
-        title: String,
-        startDate: String,
-        endDate: String,
-        active: Boolean,
-        status: String,
-        lecturerId: Long
-    ): Memo {
-        val token = tokenInterceptor.getToken()
-        val response: BaseResponse<AddMemoResponse> = memoService.addMemo(
-            token = token,
-            userId = userId,
-            title = title,
-            startDate = startDate,
-            endDate = endDate,
-            active = active,
-            status = status,
-            lecturerId = lecturerId
+    suspend fun addMemo(params: AddMemoUseCase.Params): Flow<Resource<Memo>> {
+        return mapFromApiResponse(
+            result = apiCall {
+                memoService.addMemo(
+                    token = params.token.formatToken(),
+                    userId = params.userId,
+                    title = params.title,
+                    lecturerId = params.lecturerId
+                )
+            }, addMemoMapper
         )
-        return addMemoMapper.mapFromApiResponse(response)
     }
 
     /**
      * Update an existing memo
      */
-    suspend fun updateMemo(
-        id: Long,
-        title: String,
-        startDate: String,
-        endDate: String,
-        active: Boolean,
-        status: String
-    ): Memo {
-        val token = tokenInterceptor.getToken()
-        val response: BaseResponse<MemoApiResponse> = memoService.updateMemo(
-            token = token,
-            id = id,
-            title = title,
-            startDate = startDate,
-            endDate = endDate,
-            active = active,
-            status = status
+    suspend fun updateMemo(params: UpdateMemoUseCase.Params): Flow<Resource<Memo>> {
+        return mapFromApiResponse(
+            result = apiCall {
+                memoService.updateMemo(
+                    token = params.token.formatToken(),
+                    id = params.id,
+                    userId = params.userId,
+                    title = params.title,
+                    lecturerId = params.lecturerId                )
+            }, memoDetailMapper
         )
-        return memoDetailMapper.mapFromApiResponse(response)
+    }
+
+    /**
+     * Add a comment to a memo
+     */
+    suspend fun addMemoComment(params: AddMemoCommentUseCase.Params): Flow<Resource<MemoComment>> {
+        return mapFromApiResponse(
+            result = apiCall {
+                memoService.addMemoComment(
+                    token = params.token.formatToken(),
+                    id = params.id,
+                    userId = params.userId,
+                    rating = params.rating,
+                    comment = params.comment
+                )
+            }, addMemoCommentMapper
+        )
     }
 }

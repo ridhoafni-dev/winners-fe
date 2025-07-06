@@ -11,5 +11,8 @@ class GetMemoByIdUseCase @Inject constructor(private val repository: IMemoReposi
         return repository.getMemoById(params)
     }
 
-    data class Params(val id: Long)
+    data class Params(
+        val token: String,
+        val id: Long,
+    )
 }

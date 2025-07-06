@@ -12,4 +12,5 @@ internal val featureModule = listOf(
     ModulesDep.observation,
     ModulesDep.activityPlan,
     ModulesDep.report,
+    ModulesDep.memo,
 )

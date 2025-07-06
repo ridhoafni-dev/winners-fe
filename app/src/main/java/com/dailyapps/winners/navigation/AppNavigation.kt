@@ -28,6 +28,8 @@ import com.dailyapps.feature.exam.pages.questions.ExamQuestionPage
 import com.dailyapps.feature.exam.pages.questions.ExamQuestionViewModel
 import com.dailyapps.feature.exam.pages.token.TokenPage
 import com.dailyapps.feature.exam.pages.token.TokenPageViewModel
+import com.dailyapps.feature.memo.MemoViewModel
+import com.dailyapps.feature.memo.page.list.MemoListScreen
 import com.dailyapps.feature.note.NoteScreen
 import com.dailyapps.feature.note.NoteViewModel
 import com.dailyapps.feature.observation.ObservationViewModel
@@ -316,6 +318,17 @@ fun AppNavigation() {
                     navController,
                     viewModel,
                     reportId.toLong(),
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = NavRoute.memoListScreen,
+            ) { _ ->
+                val memoViewModel: MemoViewModel = hiltViewModel()
+
+                MemoListScreen(
+                    navController,
+                    memoViewModel
                 )
             }
 

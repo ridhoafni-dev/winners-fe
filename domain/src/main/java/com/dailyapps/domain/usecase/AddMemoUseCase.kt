@@ -12,12 +12,9 @@ class AddMemoUseCase @Inject constructor(private val repository: IMemoRepository
     }
 
     data class Params(
+        val token: String,
         val userId: Long,
         val title: String,
-        val startDate: String,
-        val endDate: String,
-        val active: Boolean,
-        val status: String,
         val lecturerId: Long
     )
 }
