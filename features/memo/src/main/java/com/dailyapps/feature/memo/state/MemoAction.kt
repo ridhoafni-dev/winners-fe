@@ -34,4 +34,11 @@ sealed class MemoAction {
         val comment: String,
         val rating: Int
     ) : MemoAction()
+
+    // New actions for MemoFormScreen
+    data class OnGetMemo(val id: Long, val token: String) : MemoAction()
+    data class OnMemoValueChange(val title: String, val lecturerId: Long) : MemoAction()
+    object OnSubmitMemo : MemoAction()
+    data class OnUpdateMemo(val id: Long) : MemoAction()
+    object OnResetState : MemoAction()
 }

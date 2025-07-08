@@ -1,6 +1,7 @@
 package com.dailyapps.feature.memo
 
 import androidx.lifecycle.viewModelScope
+import com.dailyapps.common.utils.DateUtil
 import com.dailyapps.common.utils.ViewModelState
 import com.dailyapps.domain.usecase.AddMemoCommentUseCase
 import com.dailyapps.domain.usecase.AddMemoUseCase
@@ -61,7 +62,7 @@ class MemoViewModel @Inject constructor(
                     else flowOf(emptyList())
                 }
                 .collectLatest { teachers ->
-                    update { copy(addMemoState = addMemoState.copy(lecturers = teachers)) }
+                    update { copy(add = add.copy(lecturers = teachers)) }
                 }
         }
     }
@@ -103,12 +104,66 @@ class MemoViewModel @Inject constructor(
                 action.lecturerId
             )
 
-            is MemoAction.AddComment -> addComment(
+            is MemoAction.AddComment -> addMemoComment(
                 action.memoId,
                 action.userId,
                 action.comment,
                 action.rating
             )
+
+            // New form actions handlers
+            is MemoAction.OnGetMemo -> getMemoById(action.id)
+
+            is MemoAction.OnMemoValueChange -> {
+                update {
+                    copy(
+                        add = add.copy(
+                            title = action.title,
+                            lecturerId = action.lecturerId
+                        )
+                    )
+                }
+            }
+
+            is MemoAction.OnSubmitMemo -> {
+                val currentState = state.value
+                addMemo(
+                    currentState.userId,
+                    currentState.add.title,
+                    currentState.add.lecturerId
+                )
+            }
+
+            is MemoAction.OnUpdateMemo -> {
+                val currentState = state.value
+                updateMemo(
+                    action.id,
+                    currentState.add.title,
+                    currentState.add.lecturerId
+                )
+            }
+
+            is MemoAction.OnResetState -> {
+                update {
+                    copy(
+                        isLoading = false,
+                        errorMessage = null,
+                        isSuccess = false,
+                        add = add.copy(
+                            title = "",
+                            lecturerId = 0L,
+                            isSuccess = false,
+                            errorMessage = null,
+                            isLoading = false
+                        ),
+                        detail = detail.copy(
+                            memo = null,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    )
+                }
+            }
 
             // Legacy actions for backward compatibility
             is MemoAction.LoadMemos, is MemoAction.FilterByDate -> {
@@ -137,60 +192,30 @@ class MemoViewModel @Inject constructor(
         startDate: String,
         endDate: String,
         token: String,
-        lecturer: Boolean = false
+        isLecturer: Boolean
     ) {
         viewModelScope.launch {
-            update { 
-                copy(
-                    isLoading = true,
-                    memoListState = memoListState.copy(isLoading = true)
-                )
-            }
+            update { copy(memoListState = memoListState.copy(isLoading = true)) }
 
-            getMemosByUserIdByDateUseCase(
-                GetMemosByUserIdByDateUseCase.Params(
-                    userId = userId,
-                    startDate = startDate,
-                    endDate = endDate,
-                    lecturer = lecturer,
-                    token = token
-                )
-            ).collectLatest { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        update {
-                            copy(
+            when (val result = getMemosByUserIdByDateUseCase(userId, startDate, endDate, token, isLecturer)) {
+                is Resource.Error -> {
+                    update {
+                        copy(
+                            memoListState = memoListState.copy(
                                 isLoading = false,
-                                errorMessage = null,
-                                memoListState = memoListState.copy(
-                                    memos = result.data,
-                                    isLoading = false,
-                                    errorMessage = null
-                                )
+                                errorMessage = result.message
                             )
-                        }
+                        )
                     }
-                    is Resource.Error -> {
-                        update {
-                            copy(
+                }
+                is Resource.Success -> {
+                    update {
+                        copy(
+                            memoListState = memoListState.copy(
                                 isLoading = false,
-                                errorMessage = result.msg,
-                                memoListState = memoListState.copy(
-                                    isLoading = false,
-                                    errorMessage = result.msg
-                                )
+                                memos = result.data ?: emptyList()
                             )
-                        }
-                    }
-                    is Resource.Loading -> {
-                        update {
-                            copy(
-                                isLoading = true,
-                                memoListState = memoListState.copy(
-                                    isLoading = true
-                                )
-                            )
-                        }
+                        )
                     }
                 }
             }
@@ -199,51 +224,27 @@ class MemoViewModel @Inject constructor(
 
     private fun getMemoById(id: Long) {
         viewModelScope.launch {
-            update {
-                copy(
-                    memoDetailState = memoDetailState.copy(
-                        isLoading = true,
-                        errorMessage = null
-                    )
-                )
-            }
+            update { copy(detail = detail.copy(isLoading = true)) }
 
-            getMemoByIdUseCase(
-                GetMemoByIdUseCase.Params(
-                    id = id,
-                    token = currentState().token
-                )
-            ).collectLatest { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        update {
-                            copy(
-                                memoDetailState = memoDetailState.copy(
-                                    memo = result.data,
-                                    isLoading = false,
-                                    errorMessage = null
-                                )
+            when (val result = getMemoByIdUseCase(id)) {
+                is Resource.Error -> {
+                    update {
+                        copy(
+                            detail = detail.copy(
+                                isLoading = false,
+                                errorMessage = result.message
                             )
-                        }
+                        )
                     }
-                    is Resource.Error -> {
-                        update {
-                            copy(
-                                memoDetailState = memoDetailState.copy(
-                                    isLoading = false,
-                                    errorMessage = result.msg
-                                )
+                }
+                is Resource.Success -> {
+                    update {
+                        copy(
+                            detail = detail.copy(
+                                isLoading = false,
+                                memo = result.data
                             )
-                        }
-                    }
-                    is Resource.Loading -> {
-                        update {
-                            copy(
-                                memoDetailState = memoDetailState.copy(
-                                    isLoading = true
-                                )
-                            )
-                        }
+                        )
                     }
                 }
             }
@@ -258,60 +259,39 @@ class MemoViewModel @Inject constructor(
         viewModelScope.launch {
             update {
                 copy(
-                    addMemoState = addMemoState.copy(
-                        isLoading = true,
-                        errorMessage = null,
-                        isSuccess = false
-                    )
+                    isLoading = true,
+                    errorMessage = null,
+                    isSuccess = false
                 )
             }
 
-            addMemoUseCase(
-                AddMemoUseCase.Params(
-                    userId = userId,
-                    title = title,
-                    lecturerId = lecturerId,
-                    token = currentState().token
-                )
-            ).collectLatest { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        update {
-                            copy(
-                                addMemoState = addMemoState.copy(
-                                    isLoading = false,
-                                    errorMessage = null,
-                                    isSuccess = true
-                                )
-                            )
-                        }
-                        // Refresh the memo list after adding
-                        getMemos(
-                            currentState().userId,
-                            currentState().memoListState.startDate,
-                            currentState().memoListState.endDate,
-                            currentState().token
+            val today = DateUtil.getCurrentDate()
+
+            when (val result = addMemoUseCase(
+                userId,
+                title,
+                today,
+                today,
+                true,
+                "Aktif",
+                lecturerId
+            )) {
+                is Resource.Error -> {
+                    update {
+                        copy(
+                            isLoading = false,
+                            errorMessage = result.message,
+                            isSuccess = false
                         )
                     }
-                    is Resource.Error -> {
-                        update {
-                            copy(
-                                addMemoState = addMemoState.copy(
-                                    isLoading = false,
-                                    errorMessage = result.msg,
-                                    isSuccess = false
-                                )
-                            )
-                        }
-                    }
-                    is Resource.Loading -> {
-                        update {
-                            copy(
-                                addMemoState = addMemoState.copy(
-                                    isLoading = true
-                                )
-                            )
-                        }
+                }
+                is Resource.Success -> {
+                    update {
+                        copy(
+                            isLoading = false,
+                            errorMessage = null,
+                            isSuccess = true
+                        )
                     }
                 }
             }
@@ -321,105 +301,66 @@ class MemoViewModel @Inject constructor(
     private fun updateMemo(
         id: Long,
         title: String,
-        lecturerId: Long,
+        lecturerId: Long
     ) {
         viewModelScope.launch {
             update {
                 copy(
-                    updateMemoState = updateMemoState.copy(
-                        isLoading = true,
-                        errorMessage = null,
-                        isSuccess = false
-                    )
+                    isLoading = true,
+                    errorMessage = null,
+                    isSuccess = false
                 )
             }
 
-            updateMemoUseCase(
-                UpdateMemoUseCase.Params(
-                    id = id,
-                    title = title,
-                    token = currentState().token,
-                    userId = currentState().userId,
-                    lecturerId = lecturerId
-                )
-            ).collectLatest { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        update {
-                            copy(
-                                updateMemoState = updateMemoState.copy(
-                                    isLoading = false,
-                                    errorMessage = null,
-                                    isSuccess = true
-                                )
-                            )
-                        }
-                        // Refresh the memo list after updating
-                        getMemos(
-                            currentState().userId,
-                            currentState().memoListState.startDate,
-                            currentState().memoListState.endDate,
-                            currentState().token
+            when (val result = updateMemoUseCase(id, title, lecturerId)) {
+                is Resource.Error -> {
+                    update {
+                        copy(
+                            isLoading = false,
+                            errorMessage = result.message,
+                            isSuccess = false
                         )
-                        // Also refresh the detail view if we're looking at this memo
-                        currentState().memoDetailState.memo?.let { memo ->
-                            if (memo.id?.toLong() == id) {
-                                getMemoById(id)
-                            }
-                        }
                     }
-                    is Resource.Error -> {
-                        update {
-                            copy(
-                                updateMemoState = updateMemoState.copy(
-                                    isLoading = false,
-                                    errorMessage = result.msg,
-                                    isSuccess = false
-                                )
-                            )
-                        }
-                    }
-                    is Resource.Loading -> {
-                        update {
-                            copy(
-                                updateMemoState = updateMemoState.copy(
-                                    isLoading = true
-                                )
-                            )
-                        }
+                }
+                is Resource.Success -> {
+                    update {
+                        copy(
+                            isLoading = false,
+                            errorMessage = null,
+                            isSuccess = true
+                        )
                     }
                 }
             }
         }
     }
 
-    private fun addComment(
+    private fun addMemoComment(
         memoId: Long,
         userId: Long,
         comment: String,
         rating: Int
     ) {
         viewModelScope.launch {
-            addMemoCommentUseCase(
-                AddMemoCommentUseCase.Params(
-                    id = memoId,
-                    userId = userId,
-                    comment = comment,
-                    rating = rating,
-                    token = currentState().token
-                )
-            ).collectLatest { result ->
-                when (result) {
-                    is Resource.Success -> {
-                        // Refresh the memo detail to see the new comment
-                        getMemoById(memoId)
+            update { copy(isLoading = true) }
+
+            when (val result = addMemoCommentUseCase(memoId, userId, comment, rating)) {
+                is Resource.Error -> {
+                    update {
+                        copy(
+                            isLoading = false,
+                            errorMessage = result.message
+                        )
                     }
-                    is Resource.Error -> {
-                        // Update error state if needed
+                }
+                is Resource.Success -> {
+                    update {
+                        copy(
+                            isLoading = false
+                        )
                     }
-                    is Resource.Loading -> {
-                        // Update loading state if needed
-                    }
+                    // Reload the memo to get updated comments
+                    getMemoById(memoId)
                 }
             }
         }

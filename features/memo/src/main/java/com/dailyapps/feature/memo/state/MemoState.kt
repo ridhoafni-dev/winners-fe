@@ -10,10 +10,13 @@ import com.dailyapps.entity.Teacher
 data class MemoState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val isError: Boolean = false,
+    val isSuccess: Boolean = false,
     val memoListState: MemoListState = MemoListState(),
-    val memoDetailState: MemoDetailState = MemoDetailState(),
-    val addMemoState: AddMemoState = AddMemoState(),
-    val updateMemoState: UpdateMemoState = UpdateMemoState(),
+    // Rename these properties to match what's used in MemoFormScreen
+    val detail: MemoDetailState = MemoDetailState(),
+    val add: AddMemoState = AddMemoState(),
+    val update: UpdateMemoState = UpdateMemoState(),
     val userId: Long = 0L,
     val token: String = "",
     val role: String = "",
