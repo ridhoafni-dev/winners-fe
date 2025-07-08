@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="memo_title">Memo</string>
+    <string name="memo_detail_title">Memo Detail</string>
+    <string name="memo_not_found">Memo not found</string>
+    <string name="created_by">Created By</string>
+    <string name="created_date">Created Date</string>
+    <string name="unknown_user">-</string>
+    <string name="unknown_date">-</string>
+    <string name="no_title">-</string>
 </resources>

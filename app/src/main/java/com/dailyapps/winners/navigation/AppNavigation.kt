@@ -29,6 +29,7 @@ import com.dailyapps.feature.exam.pages.questions.ExamQuestionViewModel
 import com.dailyapps.feature.exam.pages.token.TokenPage
 import com.dailyapps.feature.exam.pages.token.TokenPageViewModel
 import com.dailyapps.feature.memo.MemoViewModel
+import com.dailyapps.feature.memo.page.detail.MemoDetailScreen
 import com.dailyapps.feature.memo.page.list.MemoListScreen
 import com.dailyapps.feature.note.NoteScreen
 import com.dailyapps.feature.note.NoteViewModel
@@ -164,7 +165,14 @@ fun AppNavigation() {
                 val ujianEnd = navBackStackEntry.arguments?.getString("ujianEnd") ?: ""
                 val matpel = navBackStackEntry.arguments?.getString("matpel") ?: ""
                 TokenPage(
-                    navController, tokenPageViewModel, token, authToken, ujianId, siswaId, ujianEnd, matpel
+                    navController,
+                    tokenPageViewModel,
+                    token,
+                    authToken,
+                    ujianId,
+                    siswaId,
+                    ujianEnd,
+                    matpel
                 )
             }
 
@@ -189,7 +197,8 @@ fun AppNavigation() {
                 val token = navBackStackEntry.arguments?.getString("authToken") ?: ""
                 val ujianId = navBackStackEntry.arguments?.getInt("ujianId") ?: 0
                 val siswaId = navBackStackEntry.arguments?.getInt("siswaId") ?: 0
-                val ujianEnd = (navBackStackEntry.arguments?.getString("ujianEnd") ?: "").toLocalDateTime()
+                val ujianEnd =
+                    (navBackStackEntry.arguments?.getString("ujianEnd") ?: "").toLocalDateTime()
                 val matpel = navBackStackEntry.arguments?.getString("matpel") ?: ""
                 ExamQuestionPage(
                     navController,
@@ -238,7 +247,7 @@ fun AppNavigation() {
             composableWithSlideAnimation(
                 route = "${NavRoute.formObservationScreen}/{observationId}",
                 arguments = listOf(
-                navArgument("observationId") { type = NavType.IntType }
+                    navArgument("observationId") { type = NavType.IntType }
                 )
             ) { navBackStackEntry ->
                 val observationViewModel: ObservationViewModel = hiltViewModel()
@@ -254,7 +263,7 @@ fun AppNavigation() {
             composableWithSlideAnimation(
                 route = "${NavRoute.formActivityPlanScreen}/{activityPlanId}",
                 arguments = listOf(
-                navArgument("activityPlanId") { type = NavType.IntType }
+                    navArgument("activityPlanId") { type = NavType.IntType }
                 )
             ) { navBackStackEntry ->
                 val activityPlanViewModel: ActivityPlanViewModel = hiltViewModel()
@@ -332,6 +341,17 @@ fun AppNavigation() {
                 )
             }
 
+            composableWithSlideAnimation(
+                route = "${NavRoute.memoDetailScreen}/{memoId}",
+                arguments = listOf(navArgument("memoId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val memoId = backStackEntry.arguments?.getLong("memoId") ?: 0L
+                MemoDetailScreen(
+                    navController = navController,
+                    memoId = memoId,
+                    viewModel = hiltViewModel()
+                )
+            }
         }
     }
 }
