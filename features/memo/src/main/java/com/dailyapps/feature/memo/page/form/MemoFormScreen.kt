@@ -21,10 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.dailyapps.common.Neutral900
 import com.dailyapps.common.components.BaseAppBar
 import com.dailyapps.common.components.BaseButton
 import com.dailyapps.common.components.BaseTextField
