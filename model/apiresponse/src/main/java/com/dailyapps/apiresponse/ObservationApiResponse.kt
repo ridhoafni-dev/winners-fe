@@ -50,7 +50,10 @@ data class UserApiResponse(
 	val id: Int? = null,
 
 	@field:SerializedName("email")
-	val email: String? = null
+	val email: String? = null,
+
+	@field:SerializedName("profile")
+	val profile: ProfileApiResponse? = null,
 )
 
 data class ObservationCommentsApiResponse(

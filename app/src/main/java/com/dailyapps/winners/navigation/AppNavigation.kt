@@ -30,6 +30,7 @@ import com.dailyapps.feature.exam.pages.token.TokenPage
 import com.dailyapps.feature.exam.pages.token.TokenPageViewModel
 import com.dailyapps.feature.memo.MemoViewModel
 import com.dailyapps.feature.memo.page.detail.MemoDetailScreen
+import com.dailyapps.feature.memo.page.form.MemoFormScreen
 import com.dailyapps.feature.memo.page.list.MemoListScreen
 import com.dailyapps.feature.note.NoteScreen
 import com.dailyapps.feature.note.NoteViewModel
@@ -350,6 +351,22 @@ fun AppNavigation() {
                     navController = navController,
                     memoId = memoId,
                     viewModel = hiltViewModel()
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.formMemoScreen}/{memoId}",
+                arguments = listOf(
+                    navArgument("memoId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
+                val viewModel: MemoViewModel = hiltViewModel()
+                val memoId = navBackStackEntry.arguments?.getInt("memoId") ?: 0
+
+                MemoFormScreen(
+                    navController,
+                    viewModel,
+                    memoId.toLong(),
                 )
             }
         }

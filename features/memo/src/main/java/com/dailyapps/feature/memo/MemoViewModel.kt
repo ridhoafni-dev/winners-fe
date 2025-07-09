@@ -51,7 +51,7 @@ class MemoViewModel @Inject constructor(
                             userId = user.id?.toLong() ?: 0L,
                             token = user.token ?: "",
                             role = user.role ?: "",
-                            isUserLecturer = (user.role == "lecturer"),
+                            isUserLecturer = (user.role == "LECTURER"),
                             isUserNotExist = user.id == null
                         )
                     }
@@ -377,7 +377,8 @@ class MemoViewModel @Inject constructor(
                         update {
                             copy(
                                 isLoading = false,
-                                isError = false
+                                isError = false,
+                                isSuccess = true
                             )
                         }
                         // Reload the memo to get updated comments

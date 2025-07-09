@@ -20,7 +20,7 @@ data class MemoApiResponse(
 	val userId: Int? = null,
 
 	@field:SerializedName("user")
-	val user: User? = null,
+	val user: UserApiResponse? = null,
 
 	@field:SerializedName("createAt")
 	val createAt: String? = null,
@@ -30,6 +30,11 @@ data class MemoApiResponse(
 
 	@field:SerializedName("memoComment")
 	val memoCommentResponse: MemoCommentResponse? = null
+)
+
+data class ProfileApiResponse(
+	@field:SerializedName("name")
+	val name: String? = null,
 )
 
 data class MemoCommentResponse(

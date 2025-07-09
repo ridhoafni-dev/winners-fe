@@ -25,13 +25,14 @@ class MemoDetailMapper @Inject constructor(): Mapper<BaseResponse<MemoApiRespons
         )
     }
 
-    private fun mapUser(apiUser: com.dailyapps.apiresponse.User?): User? {
+    private fun mapUser(apiUser: com.dailyapps.apiresponse.UserApiResponse?): User? {
         if (apiUser == null) return null
 
         return User(
             id = apiUser.id,
             email = apiUser.email,
-            role = apiUser.role
+            role = apiUser.role,
+            name = apiUser.profile?.name ?: "-"
         )
     }
 
