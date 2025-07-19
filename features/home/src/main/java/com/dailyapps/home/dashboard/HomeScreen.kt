@@ -135,7 +135,7 @@ fun ListHomeMenu(selected: String, navController: NavHostController) {
 
                         "Self Reflection" -> {
                             Handler(Looper.getMainLooper()).postDelayed({
-                                navController.navigate(NavRoute.listExamScreen)
+                                navController.navigate(NavRoute.selfReflectionScreen)
                             }, 200)
                         }
                     }

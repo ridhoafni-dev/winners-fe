@@ -18,4 +18,5 @@ object ModulesDep {
     const val activityPlan = ":features:activity_plan"
     const val report = ":features:report"
     const val memo = ":features:memo"
+    const val selfReflection = ":features:self-reflection"
 }

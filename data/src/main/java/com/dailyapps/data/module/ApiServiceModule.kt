@@ -11,6 +11,7 @@ import com.dailyapps.data.remote.service.NoteService
 import com.dailyapps.data.remote.service.ObservationService
 import com.dailyapps.data.remote.service.ReportsService
 import com.dailyapps.data.remote.service.ScoreService
+import com.dailyapps.data.remote.service.SelfReflectionService
 import com.dailyapps.data.remote.service.StudentService
 import dagger.Module
 import dagger.Provides
@@ -90,6 +91,12 @@ class ApiServiceModule {
     @Singleton
     fun provideMemosService(retrofit: Retrofit): MemoService {
         return retrofit.create(MemoService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSelfReflectionService(retrofit: Retrofit): SelfReflectionService {
+        return retrofit.create(SelfReflectionService::class.java)
     }
 
 }

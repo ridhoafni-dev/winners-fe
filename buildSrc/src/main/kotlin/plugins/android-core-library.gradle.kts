@@ -19,12 +19,28 @@ android{
         vectorDrawables{
             useSupportLibrary = true
         }
+        // Add 16 KB page size alignment for native libraries
+        externalNativeBuild {
+            cmake {
+                arguments(
+                    "-DANDROID_STL=c++_shared",
+                    "-DANDROID_PLATFORM_LEVEL=android-21",
+                    "-DANDROID_MM_16KB_PAGESIZE_COMPATIBILITY=ON"
+                )
+            }
+        }
+    }
+    // For libraries included as prebuilt binaries
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+        }
     }
     buildTypes {
         debug {
             isMinifyEnabled = false
             isShrinkResources = false
-            buildConfigField("String", "BASE_URL", "\"http://10.25.129.78:8080/api/\"")
+            buildConfigField("String", "BASE_URL", "\"http://192.168.1.3:8080/api/\"")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         release {

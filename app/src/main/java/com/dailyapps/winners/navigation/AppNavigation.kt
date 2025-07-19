@@ -41,6 +41,10 @@ import com.dailyapps.feature.observation.page.list.ObservationListScreen
 import com.dailyapps.feature.report.ReportViewModel
 import com.dailyapps.feature.report.page.form.ReportFormScreen
 import com.dailyapps.feature.report.page.list.ReportListScreen
+import com.dailyapps.feature.selfreflection.SelfReflectionViewModel
+import com.dailyapps.feature.selfreflection.page.detail.SelfReflectionDetailScreen
+import com.dailyapps.feature.selfreflection.page.form.SelfReflectionFormScreen
+import com.dailyapps.feature.selfreflection.page.list.SelfReflectionListScreen
 import com.dailyapps.home.HomeViewModel
 import com.dailyapps.home.changepassword.ChangePasswordScreen
 import com.dailyapps.home.dashboard.HomeScreen
@@ -367,6 +371,45 @@ fun AppNavigation() {
                     navController,
                     viewModel,
                     memoId.toLong(),
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = NavRoute.selfReflectionScreen,
+            ) { _ ->
+                val selfReflectionViewModel: SelfReflectionViewModel = hiltViewModel()
+
+                SelfReflectionListScreen(
+                    navController,
+                    selfReflectionViewModel
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.selfReflectionDetailScreen}/{selfReflectionId}",
+                arguments = listOf(navArgument("selfReflectionId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val selfReflectionId = backStackEntry.arguments?.getLong("selfReflectionId") ?: 0L
+                SelfReflectionDetailScreen(
+                    viewModel = hiltViewModel(),
+                    navController = navController,
+                    selfReflectionId = selfReflectionId.toString()
+                )
+            }
+
+            composableWithSlideAnimation(
+                route = "${NavRoute.selfReflectionFormScreen}/{selfReflectionId}",
+                arguments = listOf(
+                    navArgument("selfReflectionId") { type = NavType.IntType }
+                )
+            ) { navBackStackEntry ->
+                val viewModel: SelfReflectionViewModel = hiltViewModel()
+                val selfReflectionId = navBackStackEntry.arguments?.getInt("selfReflectionId") ?: 0
+
+                SelfReflectionFormScreen(
+                    navController,
+                    viewModel,
+                    selfReflectionId.toLong(),
                 )
             }
         }

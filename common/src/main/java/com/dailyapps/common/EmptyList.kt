@@ -9,14 +9,14 @@ import androidx.compose.ui.res.stringResource
 import com.dailyapps.common.components.BaseText
 
 @Composable
-fun EmptyList() {
+fun EmptyList(
+    message: String = stringResource(R.string.empty_data)
+) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         BaseText(
-            modifier = Modifier.align(Alignment.Center), text = stringResource(
-                R.string.empty_data
-            )
+            modifier = Modifier.align(Alignment.Center), text = message
         )
     }
 }
