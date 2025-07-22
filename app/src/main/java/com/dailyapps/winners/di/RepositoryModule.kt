@@ -26,8 +26,10 @@ import com.dailyapps.domain.repository.INoteRepository
 import com.dailyapps.domain.repository.IObservationRepository
 import com.dailyapps.domain.repository.IReportsRepository
 import com.dailyapps.domain.repository.IScoreRepository
+import com.dailyapps.domain.repository.ISelfReflectionRepository
 import com.dailyapps.domain.repository.IStudentRepository
 import com.dailyapps.domain.repository.IUserRepository
+import com.dailyapps.data.repository.SelfReflectionRepository
 import com.dailyapps.domain.usecase.MasterInteractor
 import com.dailyapps.domain.usecase.MasterUseCase
 import com.dailyapps.domain.usecase.UserInteractor
@@ -98,9 +100,13 @@ abstract class RepositoryModule {
     @Singleton
     abstract fun provideReportRepository(reportsRepository: ReportsRepository): IReportsRepository
 
-  @Binds
+    @Binds
     @Singleton
     abstract fun provideMemoRepository(memosRepository: MemoRepository): IMemoRepository
+
+    @Binds
+    @Singleton
+    abstract fun provideSelfReflectionRepository(selfReflectionRepository: SelfReflectionRepository): ISelfReflectionRepository
 
 //    @Binds
 //    @Singleton

@@ -41,7 +41,8 @@ class SelfReflectionMapper @Inject constructor(): Mapper<BaseResponse<List<SelfR
         if (apiLecturer == null) return null
 
         return SelfReflectionLecturer(
-            userId = apiLecturer.userId
+            userId = apiLecturer.userId,
+            name = apiLecturer.name
         )
     }
 

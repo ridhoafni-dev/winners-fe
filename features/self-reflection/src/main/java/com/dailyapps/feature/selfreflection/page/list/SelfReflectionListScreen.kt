@@ -173,7 +173,7 @@ fun ListContent(
                     EmptyList(message = "Belum ada refleksi diri")
                 } else {
                     ContentList(state.selfReflectionListState.selfReflections) { selfReflection ->
-                        navController.navigate("${NavRoute.selfReflectionScreen}/${selfReflection.id.toString()}") {
+                        navController.navigate("${NavRoute.selfReflectionDetailScreen}/${selfReflection.id.toString()}") {
                             launchSingleTop = true
                         }
                     }
@@ -275,7 +275,7 @@ fun SelfReflectionItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Created By",
+                    contentDescription = "Lecturer",
                     tint = Neutral300,
                     modifier = Modifier.size(16.dp)
                 )
@@ -283,7 +283,7 @@ fun SelfReflectionItem(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 BaseText(
-                    text = data.user?.name ?: "-",
+                    text = data.selfReflectionLecturer?.name ?: "-",
                     fontFamily = FontType.REGULAR,
                     fontSize = 14.sp,
                     fontColor = Neutral300

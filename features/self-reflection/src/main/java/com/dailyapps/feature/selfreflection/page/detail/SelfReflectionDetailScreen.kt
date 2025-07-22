@@ -253,8 +253,8 @@ fun SelfReflectionDetailContent(
                 // Created by information
                 InfoRow(
                     icon = Icons.Outlined.Person,
-                    label = "Created by",
-                    value = selfReflection.user?.name ?: "Unknown User"
+                    label = "Lecturer",
+                    value = selfReflection.selfReflectionLecturer?.name ?: "-"
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

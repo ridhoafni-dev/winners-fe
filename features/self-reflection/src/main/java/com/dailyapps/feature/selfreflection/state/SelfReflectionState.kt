@@ -30,7 +30,7 @@ data class SelfReflectionDetailState(
 )
 
 data class SelfReflectionListState(
-    val selfReflections: List<SelfReflection> = emptyList<SelfReflection>(),
+    val selfReflections: List<SelfReflection> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val startDate: String = DateUtil.getLastWeekDate(),

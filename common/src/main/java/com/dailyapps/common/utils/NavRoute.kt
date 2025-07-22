@@ -28,7 +28,7 @@ object NavRoute {
     const val memoDetailScreen = "memo_detail_screen"
     const val memoListScreen = "memoListScreen"
     const val selfReflectionScreen = "selfReflectionScreen"
-    const val selfReflectionDetailScreen = "selfReflection_detail_screen"
+    const val selfReflectionDetailScreen = "selfReflectionDetailScreen"
     const val selfReflectionFormScreen = "selfReflectionFormScreen"
 
 }

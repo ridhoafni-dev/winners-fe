@@ -12,13 +12,13 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SelfReflectionService {
-    @GET("reflections")
+    @GET("reflections/{userId}/{startDate}/{endDate}/{lecturer}")
     suspend fun getSelfReflectionsByUserIdByDate(
         @Header("Authorization") token: String,
-        @Query("userId") userId: Long,
-        @Query("startDate") startDate: String,
-        @Query("endDate") endDate: String,
-        @Query("lecturer") lecturer: Boolean
+        @Path("userId") userId: Long,
+        @Path("startDate") startDate: String,
+        @Path("endDate") endDate: String,
+        @Path("lecturer") lecturer: Boolean
     ): BaseResponse<List<SelfReflectionApiResponse>>
 
     @GET("reflections/{id}")

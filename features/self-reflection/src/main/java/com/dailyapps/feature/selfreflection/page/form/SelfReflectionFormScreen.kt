@@ -41,7 +41,7 @@ fun SelfReflectionFormScreen(
     val state = viewModel.state.collectAsStateWithLifecycle()
     val currentState = state.value
     val isEditMode = selfReflectionId != null && selfReflectionId != 0L
-    val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
     // Load self-reflection data if in edit mode
     LaunchedEffect(selfReflectionId, currentState.token) {
@@ -54,132 +54,226 @@ fun SelfReflectionFormScreen(
         }
     }
 
-    // Reset state when leaving the screen
-    LaunchedEffect(Unit) {
-        return@LaunchedEffect
-    }
-
-    // Handle success state
-    LaunchedEffect(key1 = currentState.add.isSuccess, key2 = currentState.update.isSuccess) {
-        if (currentState.add.isSuccess || currentState.update.isSuccess) {
-            Toast.makeText(
-                context,
-                if (isEditMode) "Refleksi diri berhasil diperbarui" else "Refleksi diri berhasil ditambahkan",
-                Toast.LENGTH_SHORT
-            ).show()
-            navController.popBackStack()
+    // Populate form with data when in edit mode
+    LaunchedEffect(currentState.detail.selfReflection) {
+        if (isEditMode) {
+            val selfReflection = currentState.detail.selfReflection
+            viewModel.handleAction(
+                SelfReflectionAction.OnSelfReflectionValueChange(
+                    title = selfReflection?.title ?: "",
+                    lecturerId = selfReflection?.selfReflectionLecturer?.userId?.toLong() ?: 0L
+                )
+            )
         }
     }
 
-    // Handle error state
-    LaunchedEffect(key1 = currentState.add.errorMessage, key2 = currentState.update.errorMessage) {
-        val errorMessage = currentState.add.errorMessage ?: currentState.update.errorMessage
-        if (errorMessage != null) {
-            Toast.makeText(
-                context,
-                errorMessage,
-                Toast.LENGTH_SHORT
-            ).show()
+    val onValueChanged = { title: String, lecturerId: Long ->
+        viewModel.handleAction(
+            SelfReflectionAction.OnSelfReflectionValueChange(
+                title = title,
+                lecturerId = lecturerId
+            )
+        )
+    }
+
+    val onSubmit = {
+        if (isEditMode) {
+            viewModel.handleAction(SelfReflectionAction.OnUpdateSelfReflection(selfReflectionId!!))
+        } else {
+            viewModel.handleAction(SelfReflectionAction.OnSubmitSelfReflection)
         }
+    }
+
+    val onSuccess = {
+        navController.popBackStack()
+        viewModel.handleAction(
+            SelfReflectionAction.OnResetState
+        )
     }
 
     Scaffold(
         topBar = {
             BaseAppBar(
                 title = if (isEditMode) "Edit Refleksi Diri" else "Tambah Refleksi Diri",
-                onClickBack = {
-                    navController.popBackStack()
-                },
+                onClickBack = { navController.popBackStack() },
                 modifier = modifier,
                 menuIconResource = null,
-                elevation = 4.dp,
+                elevation = 1.dp,
                 subTitle = null,
                 onMenuClick = { }
             )
         }
     ) { innerPadding ->
-        Column(
+        FormContent(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // Title field
-            BaseTextField(
-                value = if (isEditMode) currentState.update.title else currentState.add.title,
-                onValueChange = { title ->
-                    viewModel.handleAction(SelfReflectionAction.OnSelfReflectionValueChange(
-                        title = title,
-                        lecturerId = if (isEditMode) currentState.update.lecturerId else currentState.add.lecturerId
-                    ))
+                .verticalScroll(scrollState),
+            state = currentState,
+            onValueChanged = onValueChanged,
+            onSubmit = onSubmit,
+            onSuccess = onSuccess,
+            isEditMode = isEditMode
+        )
+    }
+}
+
+@Composable
+fun FormContent(
+    state: SelfReflectionState,
+    modifier: Modifier,
+    onValueChanged: (title: String, lecturerId: Long) -> Unit = { _, _ -> },
+    onSubmit: () -> Unit = {},
+    onSuccess: () -> Unit = {},
+    isEditMode: Boolean = false
+) {
+    val context = LocalContext.current
+
+    val isLoading = if (isEditMode) state.update.isLoading else state.add.isLoading
+    val isSuccess = if (isEditMode) state.update.isSuccess else state.add.isSuccess
+    val errorMessage = if (isEditMode) state.update.errorMessage else state.add.errorMessage
+
+    // Form state
+    val title = if (isEditMode) state.update.title else state.add.title
+    val selectedLecturerId = if (isEditMode) state.update.lecturerId else state.add.lecturerId
+    val lecturers = if (isEditMode) state.update.lecturers else state.add.lecturers
+
+    // Validation state
+    var titleError by remember { mutableStateOf("") }
+    var lecturerError by remember { mutableStateOf("") }
+    var showValidationErrors by remember { mutableStateOf(false) }
+
+    // Validate all fields
+    fun validateForm(): Boolean {
+        var isValid = true
+
+        // Validate title
+        if (title.isBlank()) {
+            titleError = "Judul refleksi diri diperlukan"
+            isValid = false
+        } else {
+            titleError = ""
+        }
+
+        // Validate lecturer selection if user is not a lecturer
+        if (state.role != "LECTURER" && selectedLecturerId <= 0) {
+            lecturerError = "Pilih dosen pembimbing"
+            isValid = false
+        } else {
+            lecturerError = ""
+        }
+
+        showValidationErrors = !isValid
+        return isValid
+    }
+
+    // Remember the selected lecturer name across recompositions
+    var selectedLecturerName by remember(selectedLecturerId, lecturers) {
+        mutableStateOf(lecturers.find { it.id?.toLong() == selectedLecturerId }?.name ?: "")
+    }
+
+    // Update the selected lecturer name when either lecturers or selectedLecturerId changes
+    LaunchedEffect(lecturers, selectedLecturerId) {
+        if (lecturers.isNotEmpty()) {
+            val lecturer = lecturers.find { it.id?.toLong() == selectedLecturerId }
+            selectedLecturerName = lecturer?.name ?: ""
+        }
+    }
+
+    // Handle success state with LaunchedEffect
+    LaunchedEffect(isSuccess) {
+        if (isSuccess) {
+            Toast.makeText(
+                context,
+                if (isEditMode) "Refleksi diri berhasil diperbarui" else "Refleksi diri berhasil ditambahkan",
+                Toast.LENGTH_SHORT
+            ).show()
+            onSuccess()
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) {
+        // Show error message if there is one from the server
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = Color.Red,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            )
+        }
+
+        // Title field with validation
+        BaseTextField(
+            value = title,
+            title = "Judul",
+            keyboardType = KeyboardType.Text,
+            onValueChange = { currentTitle ->
+                onValueChanged(
+                    currentTitle, selectedLecturerId
+                )
+                if (currentTitle.isNotBlank()) {
+                    titleError = ""
+                }
+            },
+            placeholder = "Masukkan judul refleksi diri",
+            enable = !isLoading,
+            isError = showValidationErrors && titleError.isNotEmpty(),
+            errorMessage = if (showValidationErrors) titleError else ""
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Lecturer dropdown field - only show for students
+        if (state.role != "LECTURER") {
+            TextFieldDropdown(
+                modifier = Modifier.fillMaxWidth(),
+                text = selectedLecturerName,
+                label = "Dosen Pembimbing",
+                itemsDropdown = lecturers.map { it.name ?: "-" },
+                onValueChange = { selectedName ->
+                    lecturers.find { it.name == selectedName }?.let { lecturer ->
+                        selectedLecturerName = selectedName // Update immediately for UI responsiveness
+                        onValueChanged(
+                            title, lecturer.id?.toLong() ?: 0L
+                        )
+                        lecturerError = "" // Clear error when an item is selected
+                    }
                 },
-                label = "Judul",
-                placeholder = "Masukkan judul refleksi diri",
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                enabled = !isLoading,
+                isError = showValidationErrors && lecturerError.isNotEmpty(),
+                errorMessage = if (showValidationErrors) lecturerError else ""
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Lecturer dropdown field
-            if (currentState.role != "lecturer") { // Only show lecturer dropdown for students
-                val selectedLecturerId = if (isEditMode) currentState.update.lecturerId else currentState.add.lecturerId
-                val selectedLecturer = if (isEditMode) {
-                    currentState.update.lecturers.find { it.id?.toLong() == selectedLecturerId }
-                } else {
-                    currentState.add.lecturers.find { it.id?.toLong() == selectedLecturerId }
-                }
-
-                val lecturerItems = if (isEditMode) {
-                    currentState.update.lecturers.map { it.name ?: "-" }
-                } else {
-                    currentState.add.lecturers.map { it.name ?: "-" }
-                }
-
-                TextFieldDropdown(
-                    value = selectedLecturer?.name ?: "",
-                    onValueChange = { },
-                    label = "Dosen",
-                    placeholder = "Pilih dosen",
-                    items = lecturerItems,
-                    onItemSelected = { index ->
-                        val selectedId = if (isEditMode) {
-                            currentState.update.lecturers.getOrNull(index)?.id?.toLong() ?: 0L
-                        } else {
-                            currentState.add.lecturers.getOrNull(index)?.id?.toLong() ?: 0L
-                        }
-
-                        viewModel.onAction(SelfReflectionAction.OnSelfReflectionValueChange(
-                            title = if (isEditMode) currentState.update.title else currentState.add.title,
-                            lecturerId = selectedId
-                        ))
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Submit button
-            BaseButton(
-                text = if (isEditMode) "Perbarui" else "Simpan",
-                onClick = {
-                    if (isEditMode) {
-                        viewModel.onAction(SelfReflectionAction.OnUpdateSelfReflection(selfReflectionId!!))
-                    } else {
-                        viewModel.onAction(SelfReflectionAction.OnSubmitSelfReflection)
-                    }
-                },
-                isLoading = if (isEditMode) currentState.update.isLoading else currentState.add.isLoading,
-                enabled = if (isEditMode) {
-                    currentState.update.title.isNotEmpty() &&
-                    (currentState.role == "lecturer" || currentState.update.lecturerId != 0L)
-                } else {
-                    currentState.add.title.isNotEmpty() &&
-                    (currentState.role == "lecturer" || currentState.add.lecturerId != 0L)
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
         }
+
+        // Submit button - now shows loading state and performs validation
+        BaseButton(
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .height(56.dp)
+                .fillMaxWidth(),
+            text = if (isEditMode) "Perbarui" else "Simpan",
+            isLoading = isLoading,
+            enabled = !isLoading
+        ) {
+            if (validateForm()) {
+                onSubmit()
+            } else {
+                // Show toast for validation failure
+                Toast.makeText(
+                    context,
+                    "Harap perbaiki kesalahan pada formulir",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }

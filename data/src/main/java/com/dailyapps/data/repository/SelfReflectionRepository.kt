@@ -13,21 +13,22 @@ import com.dailyapps.entity.SelfReflectionComment
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class SelfReflectionRepositoryImpl @Inject constructor(
-    private val remoteDataSource: SelfReflectionRemoteDataSource
-) : ISelfReflectionRepository {
+class SelfReflectionRepository @Inject constructor(
+    private val selfReflectionRemoteDataSource: SelfReflectionRemoteDataSource
+) : ISelfReflectionRepository{
     override suspend fun getSelfReflectionsByUserIdByDate(params: GetSelfReflectionsByUserIdByDateUseCase.Params): Flow<Resource<List<SelfReflection>>> =
-        remoteDataSource.getSelfReflectionsByUserIdByDate(params)
+        selfReflectionRemoteDataSource.getSelfReflectionsByUserIdByDate(params)
 
     override suspend fun getSelfReflectionById(params: GetSelfReflectionByIdUseCase.Params): Flow<Resource<SelfReflection>> =
-        remoteDataSource.getSelfReflectionById(params)
+        selfReflectionRemoteDataSource.getSelfReflectionById(params)
 
     override suspend fun addSelfReflection(params: AddSelfReflectionUseCase.Params): Flow<Resource<SelfReflection>> =
-        remoteDataSource.addSelfReflection(params)
+        selfReflectionRemoteDataSource.addSelfReflection(params)
 
     override suspend fun updateSelfReflection(params: UpdateSelfReflectionUseCase.Params): Flow<Resource<SelfReflection>> =
-        remoteDataSource.updateSelfReflection(params)
+        selfReflectionRemoteDataSource.updateSelfReflection(params)
 
     override suspend fun addSelfReflectionComment(params: AddSelfReflectionCommentUseCase.Params): Flow<Resource<SelfReflectionComment>> =
-        remoteDataSource.addSelfReflectionComment(params)
+        selfReflectionRemoteDataSource.addSelfReflectionComment(params)
+
 }
