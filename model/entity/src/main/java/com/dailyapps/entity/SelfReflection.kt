@@ -15,6 +15,7 @@ data class SelfReflection(
 data class SelfReflectionLecturer(
     val userId: Long? = null,
     val name: String? = null,
+    val id: Long? = null,
 )
 
 data class SelfReflectionComment(

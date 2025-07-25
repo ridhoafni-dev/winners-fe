@@ -78,7 +78,8 @@ fun SelfReflectionListScreen(
                 userId = currentState.userId,
                 startDate = currentState.selfReflectionListState.startDate,
                 endDate = currentState.selfReflectionListState.endDate,
-                token = currentState.token
+                token = currentState.token,
+                lecturer = currentState.isUserLecturer
             )
         )
     }
@@ -89,7 +90,8 @@ fun SelfReflectionListScreen(
                 userId = currentState.userId,
                 startDate = currentState.selfReflectionListState.startDate,
                 endDate = currentState.selfReflectionListState.endDate,
-                token = currentState.token
+                token = currentState.token,
+                lecturer = currentState.isUserLecturer
             )
         )
     }
@@ -110,11 +112,12 @@ fun SelfReflectionListScreen(
                     userId = currentState.userId,
                     startDate = startDate,
                     endDate = endDate,
-                    token = currentState.token
+                    token = currentState.token,
+                    lecturer = currentState.isUserLecturer
                 )
             )
         },
-        onRetry = onRetry
+        onRetry = onRetry,
     )
 }
 
@@ -172,7 +175,7 @@ fun ListContent(
                 } else if (state.selfReflectionListState.selfReflections.isEmpty()) {
                     EmptyList(message = "Belum ada refleksi diri")
                 } else {
-                    ContentList(state.selfReflectionListState.selfReflections) { selfReflection ->
+                    ContentList(state.selfReflectionListState.selfReflections, isUserLecturer) { selfReflection ->
                         navController.navigate("${NavRoute.selfReflectionDetailScreen}/${selfReflection.id.toString()}") {
                             launchSingleTop = true
                         }
@@ -184,13 +187,13 @@ fun ListContent(
 }
 
 @Composable
-fun ContentList(selfReflections: List<SelfReflection>, onItemClick: (SelfReflection) -> Unit = {}) {
+fun ContentList(selfReflections: List<SelfReflection>, isUserLecturer: Boolean, onItemClick: (SelfReflection) -> Unit = {}) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
         items(selfReflections) { selfReflection ->
-            SelfReflectionItem(data = selfReflection) { selfReflectionParam ->
+            SelfReflectionItem(data = selfReflection, isUserLecturer) { selfReflectionParam ->
                 onItemClick(selfReflectionParam)
             }
         }
@@ -200,6 +203,7 @@ fun ContentList(selfReflections: List<SelfReflection>, onItemClick: (SelfReflect
 @Composable
 fun SelfReflectionItem(
     data: SelfReflection,
+    isUserLecturer: Boolean,
     modifier: Modifier = Modifier,
     onItemClick: (SelfReflection) -> Unit = {},
 ) {
@@ -275,7 +279,7 @@ fun SelfReflectionItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Lecturer",
+                    contentDescription = if (isUserLecturer) "Student" else "Lecturer",
                     tint = Neutral300,
                     modifier = Modifier.size(16.dp)
                 )
@@ -283,7 +287,7 @@ fun SelfReflectionItem(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 BaseText(
-                    text = data.selfReflectionLecturer?.name ?: "-",
+                    text = if (isUserLecturer) data.user?.name.orEmpty() else data.selfReflectionLecturer?.name.orEmpty(),
                     fontFamily = FontType.REGULAR,
                     fontSize = 14.sp,
                     fontColor = Neutral300

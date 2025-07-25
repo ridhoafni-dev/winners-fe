@@ -169,7 +169,8 @@ fun SelfReflectionDetailScreen(
                             .verticalScroll(rememberScrollState())
                     ) {
                         SelfReflectionDetailContent(
-                            selfReflection = detailState.selfReflection!!
+                            selfReflection = detailState.selfReflection!!,
+                            isLecturer = isUserLecturer
                         )
                     }
                 }
@@ -204,7 +205,8 @@ fun SelfReflectionDetailScreen(
 @Composable
 fun SelfReflectionDetailContent(
     selfReflection: SelfReflection,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isLecturer: Boolean
 ) {
     Card(
         modifier = modifier
@@ -253,8 +255,8 @@ fun SelfReflectionDetailContent(
                 // Created by information
                 InfoRow(
                     icon = Icons.Outlined.Person,
-                    label = "Lecturer",
-                    value = selfReflection.selfReflectionLecturer?.name ?: "-"
+                    label = if (isLecturer) "Student" else "Lecturer",
+                    value = if (isLecturer) selfReflection.user?.name.orEmpty() else selfReflection.selfReflectionLecturer?.name.orEmpty()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

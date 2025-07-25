@@ -64,7 +64,7 @@ class SelfReflectionViewModel @Inject constructor(
                     else flowOf(emptyList())
                 }
                 .collectLatest { teachers ->
-                    update { copy(add = add.copy(lecturers = teachers)) }
+                    update { copy(add = add.copy(lecturers = teachers), update = update.copy(lecturers = teachers)) }
                 }
         }
     }
@@ -206,7 +206,7 @@ class SelfReflectionViewModel @Inject constructor(
                                     title = selfReflection.title ?: "",
                                     active = selfReflection.active ?: true,
                                     status = if (selfReflection.active == true) "Aktif" else "Tidak Aktif",
-                                    lecturerId = selfReflection.selfReflectionLecturer?.userId?.toLong() ?: 0L
+                                    lecturerId = selfReflection.selfReflectionLecturer?.userId ?: 0L
                                 )
                             )
                         }

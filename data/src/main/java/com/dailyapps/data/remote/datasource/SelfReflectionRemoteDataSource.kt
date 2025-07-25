@@ -66,17 +66,14 @@ class SelfReflectionRemoteDataSource @Inject constructor(
      * Add a new self reflection
      */
     suspend fun addSelfReflection(params: AddSelfReflectionUseCase.Params): Flow<Resource<SelfReflection>> {
-        val request = mapOf(
-            "title" to params.title,
-            "userId" to params.userId,
-            "lecturerId" to params.lecturerId
-        )
 
         return mapFromApiResponse(
             result = apiCall {
                 selfReflectionService.addSelfReflection(
                     token = params.token.formatToken(),
-                    request = request
+                    userId = params.userId,
+                    lecturerId = params.lecturerId,
+                    description = params.title
                 )
             }, addSelfReflectionMapper
         )
@@ -86,18 +83,15 @@ class SelfReflectionRemoteDataSource @Inject constructor(
      * Update an existing self reflection
      */
     suspend fun updateSelfReflection(params: UpdateSelfReflectionUseCase.Params): Flow<Resource<SelfReflection>> {
-        val request = mapOf(
-            "title" to params.title,
-            "userId" to params.userId,
-            "lecturerId" to params.lecturerId
-        )
 
         return mapFromApiResponse(
             result = apiCall {
                 selfReflectionService.updateSelfReflection(
                     token = params.token.formatToken(),
                     id = params.id,
-                    request = request
+                    userId = params.userId,
+                    lecturerId = params.lecturerId,
+                    description = params.title
                 )
             }, selfReflectionDetailMapper
         )

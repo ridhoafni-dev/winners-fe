@@ -36,7 +36,10 @@ data class SelfReflectionLecturerApiResponse(
     val name: String? = null,
 
     @field:SerializedName("userId")
-    val userId: Long? = null
+    val userId: Long? = null,
+
+    @field:SerializedName("id")
+    val id: Long? = null
 )
 
 data class SelfReflectionCommentApiResponse(

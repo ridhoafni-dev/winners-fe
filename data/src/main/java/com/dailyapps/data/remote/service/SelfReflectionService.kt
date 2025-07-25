@@ -2,14 +2,14 @@ package com.dailyapps.data.remote.service
 
 import com.dailyapps.apiresponse.BaseResponse
 import com.dailyapps.apiresponse.SelfReflectionApiResponse
-import retrofit2.http.Body
 import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface SelfReflectionService {
     @GET("reflections/{userId}/{startDate}/{endDate}/{lecturer}")
@@ -27,19 +27,26 @@ interface SelfReflectionService {
         @Path("id") id: Long
     ): BaseResponse<SelfReflectionApiResponse>
 
+    @FormUrlEncoded
     @POST("reflections")
     suspend fun addSelfReflection(
         @Header("Authorization") token: String,
-        @Body request: Map<String, Any>
+        @Field("userId") userId: Long,
+        @Field("description") description: String,
+        @Field("lecturerId") lecturerId: Long
     ): BaseResponse<SelfReflectionApiResponse>
 
-    @PUT("reflections/{id}")
+    @FormUrlEncoded
+    @PATCH("reflections/{id}")
     suspend fun updateSelfReflection(
         @Header("Authorization") token: String,
         @Path("id") id: Long,
-        @Body request: Map<String, Any>
+        @Field("userId") userId: Long,
+        @Field("description") description: String,
+        @Field("lecturerId") lecturerId: Long
     ): BaseResponse<SelfReflectionApiResponse>
 
+    @FormUrlEncoded
     @POST("reflections/comments/{id}")
     suspend fun addSelfReflectionComment(
         @Header("Authorization") token: String,

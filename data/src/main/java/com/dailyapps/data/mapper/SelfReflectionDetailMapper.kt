@@ -42,6 +42,7 @@ class SelfReflectionDetailMapper @Inject constructor(): Mapper<BaseResponse<Self
         return SelfReflectionLecturer(
             userId = apiLecturer.userId,
             name = apiLecturer.name,
+            id = apiLecturer.id
         )
     }
 
