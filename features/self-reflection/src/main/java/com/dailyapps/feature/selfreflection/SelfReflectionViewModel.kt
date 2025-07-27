@@ -1,7 +1,6 @@
 package com.dailyapps.feature.selfreflection
 
 import androidx.lifecycle.viewModelScope
-import com.dailyapps.common.utils.DateUtil
 import com.dailyapps.common.utils.ViewModelState
 import com.dailyapps.domain.usecase.AddSelfReflectionCommentUseCase
 import com.dailyapps.domain.usecase.AddSelfReflectionUseCase
@@ -71,9 +70,6 @@ class SelfReflectionViewModel @Inject constructor(
 
     override fun handleAction(action: SelfReflectionAction) {
         when (action) {
-            is SelfReflectionAction.LoadSelfReflections -> {
-                getSelfReflectionsList()
-            }
             is SelfReflectionAction.LoadSelfReflection -> {
                 getSelfReflection(action.id)
             }

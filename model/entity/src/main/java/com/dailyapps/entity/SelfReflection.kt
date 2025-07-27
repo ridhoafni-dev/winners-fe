@@ -22,5 +22,5 @@ data class SelfReflectionComment(
     val rating: Int? = null,
     val comment: String? = null,
     val id: Int? = null,
-    val userId: Int? = null
+    val userId: Int? = null,
 )

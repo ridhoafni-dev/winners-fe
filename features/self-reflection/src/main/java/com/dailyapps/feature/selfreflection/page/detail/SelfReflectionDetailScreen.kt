@@ -91,8 +91,9 @@ fun SelfReflectionDetailScreen(
 
     // Track if review dialog should be shown
     var showReviewDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(currentState.token) {
+        if (currentState.token.isEmpty()) return@LaunchedEffect
 
-    LaunchedEffect(key1 = Unit) {
         viewModel.handleAction(SelfReflectionAction.LoadSelfReflection(selfReflectionId.toLong()))
     }
 
@@ -155,7 +156,7 @@ fun SelfReflectionDetailScreen(
                 }
                 detailState.errorMessage != null -> {
                     ErrorUi(
-                        message = detailState.errorMessage ?: "Terjadi kesalahan",
+                        message = detailState.errorMessage,
                         onButtonClick = {
                             viewModel.handleAction(SelfReflectionAction.LoadSelfReflection(selfReflectionId.toLong()))
                         },
@@ -169,7 +170,7 @@ fun SelfReflectionDetailScreen(
                             .verticalScroll(rememberScrollState())
                     ) {
                         SelfReflectionDetailContent(
-                            selfReflection = detailState.selfReflection!!,
+                            selfReflection = detailState.selfReflection,
                             isLecturer = isUserLecturer
                         )
                     }

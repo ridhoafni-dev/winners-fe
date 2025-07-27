@@ -42,7 +42,7 @@ class SelfReflectionRemoteDataSource @Inject constructor(
                     params.userId,
                     params.startDate,
                     params.endDate,
-                    params.lecturer
+                    if (params.lecturer) 1 else 0
                 )
             }, selfReflectionMapper
         )

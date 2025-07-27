@@ -2,6 +2,7 @@ package com.dailyapps.data.remote.service
 
 import com.dailyapps.apiresponse.BaseResponse
 import com.dailyapps.apiresponse.SelfReflectionApiResponse
+import com.dailyapps.apiresponse.SelfReflectionCommentApiResponse
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -18,7 +19,7 @@ interface SelfReflectionService {
         @Path("userId") userId: Long,
         @Path("startDate") startDate: String,
         @Path("endDate") endDate: String,
-        @Path("lecturer") lecturer: Boolean
+        @Path("lecturer") lecturer: Int
     ): BaseResponse<List<SelfReflectionApiResponse>>
 
     @GET("reflections/{id}")
@@ -47,12 +48,12 @@ interface SelfReflectionService {
     ): BaseResponse<SelfReflectionApiResponse>
 
     @FormUrlEncoded
-    @POST("reflections/comments/{id}")
+    @POST("reflections/comment/{id}")
     suspend fun addSelfReflectionComment(
         @Header("Authorization") token: String,
         @Path("id") id: Long,
         @Field("userId") userId: Long,
         @Field("rating") rating: Int,
         @Field("comment") comment: String
-    ): BaseResponse<SelfReflectionApiResponse>
+    ): BaseResponse<SelfReflectionCommentApiResponse>
 }

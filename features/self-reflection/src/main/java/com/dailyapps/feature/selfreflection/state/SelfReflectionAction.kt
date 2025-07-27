@@ -4,7 +4,6 @@ package com.dailyapps.feature.selfreflection.state
  * Actions that can be performed in the Self-Reflection feature
  */
 sealed class SelfReflectionAction {
-    object LoadSelfReflections : SelfReflectionAction()
     data class LoadSelfReflection(val id: Long) : SelfReflectionAction()
     data class FilterByDate(val startDate: String, val endDate: String) : SelfReflectionAction()
     data class GetSelfReflections(
